@@ -92,7 +92,7 @@ On an ATtiny85 with 512 bytes of RAM this is not a limitation but the only sensi
 
 ## The Four Rules
 
-> TinyRTOS relies on programming discipline instead of preemptive interruption.
+> TinyRTOS relies on programming discipline instead of preemptive interruption. Alas.
 
 1. **No `delay()`** – always use `rtos_delay()`
 2. **No long loops** without `rtos_yield()` in between
