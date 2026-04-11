@@ -48,10 +48,10 @@ void taskB() {
 void setup() {
     rtos_add_task(taskA);
     rtos_add_task(taskB);
-    rtos_run(); // never returns
+    rtos_run(); // Never returns
 }
 
-void loop() {}
+void loop() {} // Will never run
 ```
 
 PB3 and PB4 are free I/O pins used in the example sketch.
