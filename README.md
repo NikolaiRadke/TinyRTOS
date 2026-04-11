@@ -5,6 +5,10 @@ Well, kind of. TinyRTOS is a **cooperative task scheduler** for the **ATtiny44/4
 
 Enables multiple tasks to run seemingly simultaneously on the popular microcontrollers with as little as 256 bytes of RAM.
 
+🆕 What's new?  
+* **11.04.2026** First release **V1.0.0**.    
+    -- More news? Check the [newsblog](https://github.com/NikolaiRadke/FreeRTOS/blob/main/NEWS.md).
+
 ## Supported MCUs
 
 | MCU | Flash | RAM | Package |
