@@ -94,6 +94,7 @@ So why call it an **RTOS?** Because *TinyCooperativeRoundRobinTaskScheduler* or 
 
 ## The Four Rules
 
+> [!NOTE]
 > TinyRTOS relies on programming discipline instead of preemptive interruption. Alas.
 
 1. **No `delay()`** – always use `rtos_delay()`
