@@ -7,7 +7,6 @@ Enables multiple tasks to run seemingly simultaneously on the popular microcontr
 
 Using **Arduino UNO/Nano**? Take a look at MiniRTOS big sister: [MiniRTOS](https://github.com/NikolaiRadke/MiniRTOS).
 
-
 🆕 What's new?  
 * **11.04.2026** First release **V1.0.0**.    
     -- More news? Check the [newsblog](https://github.com/NikolaiRadke/FreeRTOS/blob/main/NEWS.md).
