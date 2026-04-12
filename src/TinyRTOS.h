@@ -2,7 +2,7 @@
  * TinyRTOS – Cooperative Task Scheduler
  * Based on MiniRTOS by Nikolai Radke, 2026
  *
- * Footprint: ~600 bytes flash  |  10 bytes RAM + TINYRTOS_STACK_SIZE per task
+ * Footprint: ~600 bytes flash | 10 bytes RAM + TINYRTOS_STACK_SIZE per task
  *
  * Supported MCUs:
  *  ATtiny44/45/84/85
