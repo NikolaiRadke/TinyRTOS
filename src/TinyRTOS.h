@@ -25,11 +25,11 @@
 #include <stdint.h>
 
 #ifndef TINYRTOS_MAX_TASKS
-  #define TINYRTOS_MAX_TASKS   2        // max. number of tasks
+  #define TINYRTOS_MAX_TASKS   2  // max. number of tasks
 #endif
 
 #ifndef TINYRTOS_STACK_SIZE
-  #define TINYRTOS_STACK_SIZE  64       // bytes per task stack
+  #define TINYRTOS_STACK_SIZE  64 // bytes per task stack
 #endif
 
 #if TINYRTOS_STACK_SIZE < 40
@@ -42,14 +42,14 @@
 
 typedef void (*TaskFunc)(void);
 
-// Register a task – call before rtos_run()
+// Register a task. Call before rtos_run()
 void rtos_add_task(TaskFunc func);
 
-// Start the scheduler – never returns
+// Start the scheduler. Never returns
 // At least one task must be registered before calling.
 void rtos_run(void);
 
-// Cooperatively yield the CPU – call from within a task
+// Cooperatively yield the CPU. Call from within a task
 void rtos_yield(void);
 
 // Wait ms milliseconds, yielding the CPU while waiting
