@@ -25,6 +25,6 @@ jobs:
           fqbn: "ATTinyCore:avr:attinyx5:chip=85,clock=8internal,millis=enabled,LTO=Os"
           platforms: |
             - name: ATTinyCore:avr
-              source-url: http://drazzy.com/package_drazzy.com_index.json
+              source-url: https://drazzy.com/package_drazzy.com_index.json
           sketch-paths: |
             - examples
