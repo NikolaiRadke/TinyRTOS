@@ -21,12 +21,16 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: arduino/setup-arduino-cli@v2
-      - name: Install ATTinyCore
+      - name: Install ATTinyCore from GitHub
         run: |
           arduino-cli config init
-          arduino-cli config add board_manager.additional_urls http://drazzy.com/package_drazzy.com_index.json
+          mkdir -p $HOME/Arduino/hardware
+          git clone --depth 1 https://github.com/SpenceKonde/ATTinyCore.git $HOME/Arduino/hardware/ATTinyCore
+          mv $HOME/Arduino/hardware/ATTinyCore/avr $HOME/Arduino/hardware/ATTinyCore_avr
+          rm -rf $HOME/Arduino/hardware/ATTinyCore
+          mkdir -p $HOME/Arduino/hardware/ATTinyCore
+          mv $HOME/Arduino/hardware/ATTinyCore_avr $HOME/Arduino/hardware/ATTinyCore/avr
           arduino-cli core update-index
-          arduino-cli core install ATTinyCore:avr --skip-post-install
       - uses: arduino/compile-sketches@v1
         with:
           fqbn: "ATTinyCore:avr:attinyx5:chip=85,clock=8internal,millis=enabled,LTO=Os"
