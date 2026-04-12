@@ -1,0 +1,32 @@
+name: Arduino CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  check-library:
+    name: Check Arduino Library
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: arduino/arduino-lint-action@v1
+        with:
+          library-manager: submit
+          compliance: strict
+
+  check-examples:
+    name: Compile Examples
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: arduino/compile-sketches@v1
+        with:
+          fqbn: "ATTinyCore:avr:attinyx5:chip=85,clock=8internal,millis=enabled"
+          platforms: |
+            - name: ATTinyCore:avr
+              source-url: https://drazzy.com/package_drazzy.com_index.json
+          sketch-paths: |
+            - examples
+
+
