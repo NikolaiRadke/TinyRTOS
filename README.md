@@ -96,7 +96,7 @@ TinyRTOS is a **cooperative task scheduler** – not an operating system. There 
 
 On an ATtiny45 with 256 bytes of RAM this is not a limitation but the only sensible approach. TinyRTOS replaces nested state machines with readable, linear task code. Nothing more, nothing less.  
 
-So why call it an **RTOS?** Because *TinyCooperativeRoundRobinTaskScheduler* or *TinyCRRTS* sounds really weird. And FreeRTOS calls itself an RTOS too – it's a preemptive scheduler with considerably more RAM, a much longer feature list and better marketing. But on a chip so tiny you can lose it between your keyboard keys, *RTOS*feels just about right.
+So why call it an **RTOS?** Because *TinyCooperativeRoundRobinTaskScheduler* or *TinyCRRTS* sounds really weird. And FreeRTOS calls itself an RTOS too – it's a preemptive scheduler with considerably more RAM, a much longer feature list and better marketing. But on a chip so tiny you can lose it between your keyboard keys, *RTOS* feels just about right.
 
 ## The Four Rules
 
