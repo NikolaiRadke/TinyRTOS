@@ -5,10 +5,10 @@ Well, kind of. TinyRTOS is a **cooperative task scheduler** for the **ATtiny44/4
 
 Enables multiple tasks to run seemingly simultaneously on the popular microcontrollers with as little as 256 bytes of RAM.  
 
-Using **Arduino UNO/Nano**? Take a look at MiniRTOS big sister: [MiniRTOS](https://github.com/NikolaiRadke/MiniRTOS).
+Using **Arduino UNO/Nano**? Take a look at TinyRTOS sibling: [MiniRTOS](https://github.com/NikolaiRadke/MiniRTOS).
 
 🆕 What's new?  
-* **11.04.2026** First release **V1.0.0**.    
+* **10.05.2026** Release **V1.1.0** with resource protection locks (Mutex).    
     -- More news? Check the [newsblog](https://github.com/NikolaiRadke/FreeRTOS/blob/main/NEWS.md).
 
 ## Supported MCUs
@@ -70,6 +70,8 @@ PB3 and PB4 are free I/O pins used in the example sketch.
 | `rtos_run()` | Start the scheduler |
 | `rtos_yield()` | Yield the CPU cooperatively |
 | `rtos_delay(ms)` | Wait and yield during the delay |
+| `rtos_lock(lock)` | Lock a shared resource – waits if already in use |
+| `rtos_unlock(lock)` | Release the lock |
 
 ## RAM Usage
 
@@ -98,15 +100,16 @@ On an ATtiny45 with 256 bytes of RAM this is not a limitation but the only sensi
 
 So why call it an **RTOS?** Because *TinyCooperativeRoundRobinTaskScheduler* or *TinyCRRTS* sounds really weird. And FreeRTOS calls itself an RTOS too – it's a preemptive scheduler with considerably more RAM, a much longer feature list and better marketing. But on a chip so tiny you can lose it between your keyboard keys, *RTOS* feels just about right.
 
-## The Four Rules
+## The Five Rules
 
 > [!NOTE]
 > TinyRTOS relies on programming discipline instead of preemptive interruption. Alas.
 
-1. **No `delay()`** – always use `rtos_delay()`
-2. **No long loops** without `rtos_yield()` in between
-3. **Never call `rtos_yield()`** from an ISR
-4. **Tasks must be infinite loops** – returning causes undefined behavior
+1. Never use `delay()` – always use `rtos_delay()`
+2. No long loops without `rtos_yield()` in between
+3. Never call `rtos_yield()` from an ISR
+4. Always call `rtos_unlock()` – a missing unlock blocks the other task forever.
+5. Tasks must be infinite loops – returning causes undefined behavior
 
 ## License
 

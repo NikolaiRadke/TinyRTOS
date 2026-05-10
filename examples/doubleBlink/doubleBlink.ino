@@ -23,8 +23,8 @@
 
 #include "TinyRTOS.h"
 
-#define PIN_LED_SLOW  3 // PB3 (1 Hz)
-#define PIN_LED_FAST  4 // PB4 (4 Hz)
+#define PIN_LED_SLOW 3 // PB3 (1 Hz)
+#define PIN_LED_FAST 4 // PB4 (4 Hz)
 
 // Task 1: Slow LED (1 Hz) 
 void taskLedSlow() {

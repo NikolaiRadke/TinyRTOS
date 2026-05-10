@@ -2,8 +2,8 @@
  * TinyRTOS.cpp – Cooperative kernel, ATtiny44/45/84/85
  * Based on MiniRTOS by Nikolai Radke, 2026
  *
- * The AVR instruction set of the ATtiny44/45/84/85 is identical to the
- * ATmega328: all 32 registers, same stack mechanism, 2-byte program counter.
+ * The AVR instruction set of the ATtiny44/45/84/85 is identical to ATmega328:
+ * All 32 registers, same stack mechanism, 2-byte program counter.
  *
  * Important: ICALL requires a word address (byte address / 2).
  * Use pm_lo8/pm_hi8 instead of lo8/hi8 for function addresses in ICALL.
@@ -28,7 +28,7 @@ extern "C" void __attribute__((naked, used)) _mr_schedule(void) {
         "inc  r24                   \n\t"
         "lds  r25, _mr_n            \n\t"
         "cp   r24, r25              \n\t"
-        "brlo .+2                   \n\t"  // skip if r24 < r25
+        "brlo .+2                   \n\t" // skip if r24 < r25
         "clr  r24                   \n\t"
         "sts  _mr_cur, r24          \n\t"
         "ret                        \n\t"
@@ -179,7 +179,7 @@ void __attribute__((naked)) rtos_yield(void) {
         "ld   r25, x                    \n\t"
         "out  __SP_L__, r24             \n\t"
         "out  __SP_H__, r25             \n\t"
-        "rjmp _mr_restore               \n\t"  // restore registers and RET into next task
+        "rjmp _mr_restore               \n\t" // restore registers and RET into next task
         ::: "memory"
     );
 }
@@ -196,7 +196,7 @@ void __attribute__((naked)) rtos_run(void) {
         "ld   r25, x                    \n\t"
         "out  __SP_L__, r24             \n\t"
         "out  __SP_H__, r25             \n\t"
-        "rjmp _mr_restore               \n\t"  // restore registers and RET into task 0
+        "rjmp _mr_restore               \n\t" // restore registers and RET into task 0
         ::: "memory"
     );
 }
@@ -205,4 +205,14 @@ void rtos_delay(uint16_t ms) {
     uint32_t start = millis();
     while (millis() - start < ms)
         rtos_yield();
+}
+
+void rtos_lock(RtosLock *lock) {
+    while (*lock)
+        rtos_yield();
+    *lock = 1;
+}
+
+void rtos_unlock(RtosLock *lock) {
+    *lock = 0;
 }

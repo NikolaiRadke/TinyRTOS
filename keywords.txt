@@ -1,5 +1,9 @@
-TaskFunc	KEYWORD1
-rtos_add_task	KEYWORD2
-rtos_run	KEYWORD2
-rtos_yield	KEYWORD2
-rtos_delay	KEYWORD2
+TaskFunc    KEYWORD1
+rtos_add_task   KEYWORD2
+rtos_run    KEYWORD2
+rtos_yield  KEYWORD2
+rtos_delay  KEYWORD2
+RtosLock    KEYWORD1
+RTOS_LOCK_INIT  LITERAL1
+rtos_lock   KEYWORD2
+rtos_unlock KEYWORD2

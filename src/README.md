@@ -1,4 +1,4 @@
-# TinyRTOS
+# TinyRTOS V1.1
 
 Cooperative task scheduler for ATtiny44/45/84/85.
 
@@ -15,13 +15,17 @@ Cooperative task scheduler for ATtiny44/45/84/85.
 | `rtos_run()` | Start the scheduler |
 | `rtos_yield()` | Yield the CPU cooperatively |
 | `rtos_delay(ms)` | Wait and yield during the delay |
+| `rtos_lock(lock)` | Lock a shared resource – waits if already in use |
+| `rtos_unlock(lock)` | Release the lock |
+
 
 ## Rules
 
 1. Never use `delay()` – always use `rtos_delay()`
 2. No long loops without `rtos_yield()` in between
 3. Never call `rtos_yield()` from an ISR
-4. Tasks must be infinite loops – returning causes undefined behavior
+4. Always call `rtos_unlock()` – a missing unlock blocks the other task forever.
+5. Tasks must be infinite loops – returning causes undefined behavior
 
 ## License
 

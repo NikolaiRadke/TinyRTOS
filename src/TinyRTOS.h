@@ -1,5 +1,5 @@
 /*
- * TinyRTOS – Cooperative Task Scheduler
+ * TinyRTOS V1.1 – Cooperative Task Scheduler
  * Based on MiniRTOS by Nikolai Radke, 2026
  *
  * Footprint: ~600 bytes flash | 10 bytes RAM + TINYRTOS_STACK_SIZE per task
@@ -25,11 +25,11 @@
 #include <stdint.h>
 
 #ifndef TINYRTOS_MAX_TASKS
-  #define TINYRTOS_MAX_TASKS   2  // max. number of tasks
+  #define TINYRTOS_MAX_TASKS   2 // Max. number of tasks
 #endif
 
 #ifndef TINYRTOS_STACK_SIZE
-  #define TINYRTOS_STACK_SIZE  64 // bytes per task stack
+  #define TINYRTOS_STACK_SIZE  64 // Bytes per task stack
 #endif
 
 #if TINYRTOS_STACK_SIZE < 40
@@ -54,3 +54,10 @@ void rtos_yield(void);
 
 // Wait ms milliseconds, yielding the CPU while waiting
 void rtos_delay(uint16_t ms);
+
+// Shared resource lock – 1 byte RAM per instance
+typedef volatile uint8_t RtosLock;
+#define RTOS_LOCK_INIT  0
+
+void rtos_lock(RtosLock *lock);   // Wait until free, then lock
+void rtos_unlock(RtosLock *lock); // Release lock
