@@ -1,13 +1,13 @@
 # TinyRTOS
 
 Unleash the power of multitasking *FreeRTOS*-like (Real Time Operating System) for your tiny MCU!  
-Well, kind of. TinyRTOS is a **cooperative task scheduler** for the **ATtiny44/45/84/85**
-and **ATmega AVR MCUs**.
+Well, kind of. TinyRTOS is a **cooperative task scheduler** for **ATtiny and ATmega AVR MCUs** 
+with at least 256 bytes of RAM.
 
 Enables multiple tasks to run seemingly simultaneously on the popular microcontrollers with as little as 256 bytes of RAM.  
 
 🆕 What's new?  
-* **10.05.2026** Release **V1.1.0** with resource locks und merged with **MiniRTOS**.
+* **10.05.2026** Release **V1.1.0** merged with **MiniRTOS**, with resource locks and support for more MCUs. 
     -- More news? Check the [newsblog](https://github.com/NikolaiRadke/TinyRTOS/blob/main/NEWS.md).
 
 ## Supported MCUs
@@ -22,7 +22,17 @@ Enables multiple tasks to run seemingly simultaneously on the popular microcontr
 | ATmega328 | 32 KB | 2 KB | DIP-28 |
 | ATmega32U4 | 32 KB | 2.5 KB | QFP-44 |
 
-The kernel runs unchanged on all supported MCUs. On ATtiny44/45 (256 bytes RAM), keep stack sizes small.
+## Supported but untested MCUs
+
+| MCU | Flash | RAM | Package |
+|---|---|---|---|
+| ATtiny461 | 4 KB | 256 B | DIP-20 |
+| ATtiny861 | 8 KB | 512 B | DIP-20 |
+| ATtiny441 | 4 KB | 256 B | DIP-14 |
+| ATtiny841 | 8 KB | 512 B | DIP-14 |
+| ATtiny4313 | 4 KB | 256 B | DIP-20 |
+
+The kernel runs unchanged on all supported MCUs. On 256 bytes RAM MCUs: keep stack sizes small.
 
 ## Requirements
 

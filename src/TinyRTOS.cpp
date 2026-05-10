@@ -2,8 +2,8 @@
  * TinyRTOS.cpp – Cooperative kernel for AVR MCUs
 * Nikolai Radke, 2026
  *
- * The AVR instruction set of the ATtiny44/45/84/85 is identical to ATmega168/328/32U4:
- * All 32 registers, same stack mechanism, 2-byte program counter.
+ * All classic AVR MCUs share the same instruction set, stack mechanism,
+ * 32 registers, same stack mechanism, 2-byte program counter.
  *
  * Important: ICALL requires a word address (byte address / 2).
  * Use pm_lo8/pm_hi8 instead of lo8/hi8 for function addresses in ICALL.
