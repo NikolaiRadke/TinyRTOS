@@ -1,43 +1,57 @@
 /*
  * TinyRTOS V1.1 – Cooperative Task Scheduler
- * Based on MiniRTOS by Nikolai Radke, 2026
+ * Nikolai Radke, 2026
  *
  * Footprint: ~600 bytes flash | 10 bytes RAM + TINYRTOS_STACK_SIZE per task
  *
  * Supported MCUs:
- *  ATtiny44/45/84/85
- *
+ * ATtiny44/45/84/85, ATmega168/328/32U4 and other AVR MCUs 
+ * 
  * RAM usage example (ATtiny85):
- * 2 tasks × 64 bytes stack = 128 bytes
- * + kernel overhead        =  10 bytes
- * + program variables      =   5 bytes
- * ─────────────────────────────────────
-*  Total                    = 143 bytes 
+ *   2 tasks × 64 bytes stack  = 128 bytes
+ *   + kernel overhead         =  10 bytes
+ *   Total                     ≈ 138 bytes
+ *
+ * RAM usage example (ATmega328):
+ *   3 tasks × 192 bytes stack = 576 bytes
+ *   + kernel overhead         =  10 bytes
+ *   Total                     ≈ 586 bytes
  *
  * Minimum stack size per task: 40 bytes kernel overhead
  *   + call depth + ~20 bytes for timer0 ISR (millis)
  *   64 bytes recommended for simple tasks without Serial
  *
- * Requirements: ATTinyCore (Spence Konde) with millis() support
- */
+ * Requirements: ATTinyCore (Spence Konde) for ATtiny, Arduino AVR Core for ATmega
+ *               millis() support must be enabled */
 
 #pragma once
 #include <stdint.h>
 
-#ifndef TINYRTOS_MAX_TASKS
-  #define TINYRTOS_MAX_TASKS   2 // Max. number of tasks
-#endif
-
-#ifndef TINYRTOS_STACK_SIZE
-  #define TINYRTOS_STACK_SIZE  64 // Bytes per task stack
+#if defined(__AVR_ATtiny44__) || defined(__AVR_ATtiny45__) || \
+    defined(__AVR_ATtiny84__) || defined(__AVR_ATtiny85__)
+  #ifndef TINYRTOS_MAX_TASKS
+    #define TINYRTOS_MAX_TASKS   2
+  #endif
+  #ifndef TINYRTOS_STACK_SIZE
+    #define TINYRTOS_STACK_SIZE  64
+  #endif
+  #define _TINYRTOS_RAM_WARN  150
+#else  // ATmega and others
+  #ifndef TINYRTOS_MAX_TASKS
+    #define TINYRTOS_MAX_TASKS   3
+  #endif
+  #ifndef TINYRTOS_STACK_SIZE
+    #define TINYRTOS_STACK_SIZE  192
+  #endif
+  #define _TINYRTOS_RAM_WARN  800
 #endif
 
 #if TINYRTOS_STACK_SIZE < 40
   #error "TINYRTOS_STACK_SIZE must be at least 40 bytes."
 #endif
 
-#if TINYRTOS_MAX_TASKS * TINYRTOS_STACK_SIZE > 150
-  #warning "Stack usage > 150 bytes – watch RAM limits on ATtiny44/45 (256 bytes)!"
+#if TINYRTOS_MAX_TASKS * TINYRTOS_STACK_SIZE > _TINYRTOS_RAM_WARN
+  #warning "Stack usage exceeds recommended limit – check available RAM!"
 #endif
 
 typedef void (*TaskFunc)(void);
@@ -55,7 +69,7 @@ void rtos_yield(void);
 // Wait ms milliseconds, yielding the CPU while waiting
 void rtos_delay(uint16_t ms);
 
-// Shared resource lock – 1 byte RAM per instance
+// Lock a shared resource – waits if already in use
 typedef volatile uint8_t RtosLock;
 #define RTOS_LOCK_INIT  0
 

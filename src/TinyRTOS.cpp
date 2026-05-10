@@ -1,8 +1,8 @@
 /*
- * TinyRTOS.cpp – Cooperative kernel, ATtiny44/45/84/85
- * Based on MiniRTOS by Nikolai Radke, 2026
+ * TinyRTOS.cpp – Cooperative kernel for AVR MCUs
+* Nikolai Radke, 2026
  *
- * The AVR instruction set of the ATtiny44/45/84/85 is identical to ATmega328:
+ * The AVR instruction set of the ATtiny44/45/84/85 is identical to ATmega168/328/32U4:
  * All 32 registers, same stack mechanism, 2-byte program counter.
  *
  * Important: ICALL requires a word address (byte address / 2).

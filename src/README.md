@@ -1,10 +1,11 @@
 # TinyRTOS V1.1
 
-Cooperative task scheduler for ATtiny44/45/84/85.
+Cooperative task scheduler with resource locks for ATtiny and ATmega AVR MCUs.
 
 ## Requirements
 
-- ATTinyCore (Spence Konde)
+- ATTinyCore (Spence Konde) for ATtiny MCUs
+- Arduino AVR Core for ATmega MCUs
 - Board setting: millis()/micros() : Enabled
 
 ## API

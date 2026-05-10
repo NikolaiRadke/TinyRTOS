@@ -1,15 +1,14 @@
 # TinyRTOS
 
 Unleash the power of multitasking *FreeRTOS*-like (Real Time Operating System) for your tiny MCU!  
-Well, kind of. TinyRTOS is a **cooperative task scheduler** for the **ATtiny44/45/84/85**.
+Well, kind of. TinyRTOS is a **cooperative task scheduler** for the **ATtiny44/45/84/85**
+and ATmega AVR MCUs.
 
 Enables multiple tasks to run seemingly simultaneously on the popular microcontrollers with as little as 256 bytes of RAM.  
 
-Using **Arduino UNO/Nano**? Take a look at TinyRTOS sibling: [MiniRTOS](https://github.com/NikolaiRadke/MiniRTOS).
-
 🆕 What's new?  
-* **10.05.2026** Release **V1.1.0** with resource protection locks (Mutex).    
-    -- More news? Check the [newsblog](https://github.com/NikolaiRadke/FreeRTOS/blob/main/NEWS.md).
+* **10.05.2026** Release **V1.1.0** with resource locks und merged with **MiniRTOS**.
+    -- More news? Check the [newsblog](https://github.com/NikolaiRadke/TinyRTOS/blob/main/NEWS.md).
 
 ## Supported MCUs
 
@@ -19,16 +18,17 @@ Using **Arduino UNO/Nano**? Take a look at TinyRTOS sibling: [MiniRTOS](https://
 | ATtiny85 | 8 KB | 512 B | DIP-8 |
 | ATtiny44 | 4 KB | 256 B | DIP-14 |
 | ATtiny84 | 8 KB | 512 B | DIP-14 |
+| ATmega168 | 16 KB | 1 KB | DIP-28 |
+| ATmega328 | 32 KB | 2 KB | DIP-28 |
+| ATmega32U4 | 32 KB | 2.5 KB | QFP-44 |
 
-The kernel runs unchanged on all four MCUs. On ATtiny44/45 (256 bytes RAM), keep stack sizes small.
+The kernel runs unchanged on all supported MCUs. On ATtiny44/45 (256 bytes RAM), keep stack sizes small.
 
 ## Requirements
 
-- Arduino IDE with **ATTinyCore** (Spence Konde)
-- Board settings:
-  - Chip: `ATtiny45`, `ATtiny85`, `ATtiny44` or `ATtiny84`
-  - Clock: `8 MHz (internal)`
-  - millis()/micros(): `Enabled`
+- Arduino IDE with **ATTinyCore** (Spence Konde) for ATtiny MCUs
+- Arduino IDE with **Arduino AVR Core** for ATmega MCUs
+- millis()/micros(): `Enabled`
 
 ## Quick Start
 
@@ -76,11 +76,18 @@ PB3 and PB4 are free I/O pins used in the example sketch.
 ## RAM Usage
 
 ```
+ATtiny:
 2 tasks × 64 bytes stack = 128 bytes
 + kernel overhead        =  10 bytes
 + program variables      =   5 bytes
-─────────────────────────────────────
+────────────────────────────────────
 Total                    ≈ 143 bytes 
+
+ATmega328:
+3 tasks × 192 bytes stack = 576 bytes
++ kernel overhead         =  10 bytes
+─────────────────────────────────────
+Total                     ≈ 586 bytes
 ```
 
 Stack size and task count can be adjusted in `TinyRTOS.h`:
