@@ -4,7 +4,8 @@ Cooperative task scheduler with resource locks for classic ATtiny and ATmega AVR
 
 ## Requirements
 
-- ATTinyCore (Spence Konde) for ATtiny MCUs
+- ATTinyCore (Spence Konde) for classic ATtiny MCUs
+- megaTinyCore (Spence Konde) for tinyAVR 0/1/2-series MCUs
 - Arduino AVR Core for ATmega MCUs
 - Board setting: millis()/micros() : Enabled
 

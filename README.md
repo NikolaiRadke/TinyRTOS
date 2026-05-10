@@ -12,6 +12,8 @@ Enables multiple tasks to run seemingly simultaneously on the popular microcontr
 
 ## Supported MCUs
 
+### Tested
+
 | MCU | Flash | RAM | Package |
 |---|---|---|---|
 | ATtiny45 | 4 KB | 256 B | DIP-8 |
@@ -19,24 +21,37 @@ Enables multiple tasks to run seemingly simultaneously on the popular microcontr
 | ATtiny44 | 4 KB | 256 B | DIP-14 |
 | ATtiny84 | 8 KB | 512 B | DIP-14 |
 | ATmega168 | 16 KB | 1 KB | DIP-28 |
-| ATmega328 | 32 KB | 2 KB | DIP-28 |
+| ATmega328/P | 32 KB | 2 KB | DIP-28 |
 | ATmega32U4 | 32 KB | 2.5 KB | QFP-44 |
 
-## Supported but untested MCUs
+Requires **ATTinyCore** (Spence Konde) for ATtiny MCUs, **Arduino AVR Core** for ATmega MCUs.
+
+### Supported but untested
 
 | MCU | Flash | RAM | Package |
 |---|---|---|---|
-| ATtiny461 | 4 KB | 256 B | DIP-20 |
-| ATtiny861 | 8 KB | 512 B | DIP-20 |
 | ATtiny441 | 4 KB | 256 B | DIP-14 |
 | ATtiny841 | 8 KB | 512 B | DIP-14 |
+| ATtiny461 | 4 KB | 256 B | DIP-20 |
+| ATtiny861 | 8 KB | 512 B | DIP-20 |
 | ATtiny4313 | 4 KB | 256 B | DIP-20 |
 
-The kernel runs unchanged on all supported MCUs. On 256 bytes RAM MCUs: keep stack sizes small.
+Requires **ATTinyCore** (Spence Konde).
+
+### Supported but untested (SMD only)
+
+| Series | Example | Flash | RAM | Package |
+|---|---|---|---|---|
+| tinyAVR 0/1/2 – 8-pin (x02, x12) | ATtiny412 | 4–8 KB | 256–512 B | SOIC-8 |
+| tinyAVR 0/1/2 – 14-pin (x04, x14, x24) | ATtiny1614 | 4–16 KB | 256 B–2 KB | SOIC-14 |
+| tinyAVR 0/1/2 – 20-pin (x06, x16, x26) | ATtiny3216 | 4–32 KB | 256 B–2 KB | SOIC-20 |
+| tinyAVR 0/1/2 – 24-pin (x07, x17, x27) | ATtiny3217 | 8–32 KB | 512 B–3 KB | SOIC-24 |
+
+Requires **megaTinyCore** (Spence Konde). MCUs with less than 256 bytes RAM not supported.
 
 ## Requirements
-
-- Arduino IDE with **ATTinyCore** (Spence Konde) for ATtiny MCUs
+- Arduino IDE with **ATTinyCore** (Spence Konde) for classic ATtiny MCUs
+- Arduino IDE with **megaTinyCore** (Spence Konde) for tinyAVR 0/1/2-series MCUs
 - Arduino IDE with **Arduino AVR Core** for ATmega MCUs
 - millis()/micros(): `Enabled`
 
