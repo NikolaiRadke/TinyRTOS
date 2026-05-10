@@ -115,11 +115,12 @@ ATmega328:
 Total                     ≈ 586 bytes
 ```
 
-Stack size and task count can be adjusted in `TinyRTOS.h`:
+Stack size and task count can be adjusted before including the library:
 
 ```cpp
-#define TINYRTOS_MAX_TASKS   2
-#define TINYRTOS_STACK_SIZE  64
+#define TINYRTOS_MAX_TASKS   3
+#define TINYRTOS_STACK_SIZE  96
+#include "TinyRTOS.h"
 ```
 
 > ⚠️ Minimum: 40 bytes per task. Deep call stacks require more.
