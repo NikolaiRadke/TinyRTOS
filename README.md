@@ -147,7 +147,7 @@ So why call it an **RTOS?** Because *TinyCooperativeRoundRobinTaskScheduler* or 
 
 Apache 2.0 – free to use, including commercially.
 
-## 💙 Support AI.duino  
+## 💙 Support TinyRTOS
 
 TinyRTOS is free and open source. If it saved your day, consider buying me a coffee! ☕
 
