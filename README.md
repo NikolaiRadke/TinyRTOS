@@ -28,7 +28,9 @@ should be compatible (e.g. ATtiny461, ATtiny861). ATtinys with only 16 registers
    
 **Any other AVR MCU** with up to 128 KB flash should be compatible (e.g. ATmega88,
 ATmega1284P, ATmega32U4) – the kernel uses only standard AVR instructions and registers.
-
+  
+**Newer AVR Dx MCUs** (e.g. AVR128DA28) should be compatible via DxCore, but are not yet tested.
+  
 **Experimental¹:**
 
 | MCU | Flash | RAM | Package | Board |
