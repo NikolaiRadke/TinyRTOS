@@ -7,7 +7,7 @@ with at least 256 bytes of RAM.
 Enables multiple tasks to run seemingly simultaneously on the popular microcontrollers with as little as 256 bytes of RAM.  
 
 🆕 What's new?  
-* **11.05.2026** Release **V1.2.0** with experimental ATmega2560 support (3-byte PC).
+* **11.05.2026** Release **V1.2.0** with experimental ATmega2560 support (3-byte PC).  
     -- More news? Check the [newsblog](https://github.com/NikolaiRadke/TinyRTOS/blob/main/NEWS.md).
 
 ## Supported MCUs
