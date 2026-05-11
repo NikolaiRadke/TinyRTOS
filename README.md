@@ -22,11 +22,11 @@ Enables multiple tasks to run seemingly simultaneously on the popular microcontr
 | ATtiny84 | 8 KB | 512 B | DIP-14 | – |
 | ATmega328P | 32 KB | 2 KB | DIP-28 | Arduino UNO |
 
-Any other ATtiny MCU with 32 general-purpose registers and at least 256 bytes of RAM
+**Any other ATtiny MCU** with 32 general-purpose registers and at least 256 bytes of RAM
 should be compatible (e.g. ATtiny461, ATtiny861). ATtinys with only 16 registers
 (e.g. ATtiny13, ATtiny2313) or less RAN (ATtiny25) are **not** supported.
    
-Any other AVR MCU with up to 128 KB flash should be compatible (e.g. ATmega88,
+**Any other AVR MCU** with up to 128 KB flash should be compatible (e.g. ATmega88,
 ATmega1284P, ATmega32U4) – the kernel uses only standard AVR instructions and registers.
 
 **Experimental¹:**
