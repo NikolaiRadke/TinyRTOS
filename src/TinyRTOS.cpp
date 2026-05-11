@@ -2,11 +2,15 @@
  * TinyRTOS.cpp – Cooperative kernel for AVR MCUs
  * Nikolai Radke, 2026
  *
- * All supported AVR MCUs share the same instruction set, 32-register file,
- * stack mechanism, and 2-byte program counter.
+ * The AVR instruction set is identical across all supported MCUs:
+ * 32 registers, same stack mechanism. ATtiny44/45/84/85 and ATmega MCUs
+ * with up to 128 KB flash use a 2-byte program counter. The ATmega2560/2561
+ * uses a 3-byte program counter – initStack handles both cases via _TINYRTOS_PC3.
  *
  * Important: ICALL requires a word address (byte address / 2).
  * Use pm_lo8/pm_hi8 instead of lo8/hi8 for function addresses in ICALL.
+ * The ATmega2560 supports EICALL for targets beyond 128 KB, but ICALL
+ * suffices here – _mr_schedule always resides in the first 128 KB.
  *
  * Global variables use __attribute__((used)) to prevent the linker from
  * removing symbols that are only referenced in inline assembly.
@@ -51,12 +55,22 @@ static void initStack(uint8_t idx, TaskFunc func) {
 
     memset(s, 0, TINYRTOS_STACK_SIZE);
 
+#ifdef _TINYRTOS_PC3
+    // 3-byte PC: RET pops PCE, PCH, PCL
+    // All tasks reside in the first 128 KB → PCE = 0
+    s[top]     = (uint16_t)func & 0xFF;
+    s[top - 1] = ((uint16_t)func >> 8) & 0xFF;
+    s[top - 2] = 0;     // PCE
+    s[top - 3] = 0;     // r0 original
+    s[top - 4] = 0x80;  // r0-as-SREG (I-bit)
+    _mr_spt[idx] = &s[top - 36];
+#else
     s[top]     = (uint16_t)func & 0xFF;
     s[top - 1] = ((uint16_t)func >> 8) & 0xFF;
     s[top - 2] = 0;
     s[top - 3] = 0x80;
-
     _mr_spt[idx] = &s[top - 35];
+#endif
 }
 
 void rtos_add_task(TaskFunc func) {

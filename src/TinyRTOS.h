@@ -4,9 +4,10 @@
  *
  * Footprint: ~600 bytes flash | 10 bytes RAM + TINYRTOS_STACK_SIZE per task
  *
-* Supported MCUs:
- *   ATtiny44/45/84/85, ATmega168/328/328P/32U4 (tested)
- *   All ATTinyCore and megaTinyCore MCUs with 256+ bytes RAM (untested)
+ * Supported MCUs:
+ * ATtiny44/45/84/85 and other ATtiny MCUs with 32 GPRs and ≥256 bytes RAM.
+ * ATmega328P and any other AVR MCU with up to 128 KB flash.
+ * ATmega2560/2561 (experimental, 3-byte PC).
  * 
  * RAM usage example (ATtiny85):
  *   2 tasks × 64 bytes stack  = 128 bytes
@@ -36,6 +37,15 @@
     #define TINYRTOS_STACK_SIZE  64
   #endif
   #define _TINYRTOS_RAM_WARN  150
+#elif FLASHEND > 0x1FFFF  // 3-Byte-PC: ATmega2560/2561
+  #ifndef TINYRTOS_MAX_TASKS
+    #define TINYRTOS_MAX_TASKS   4
+  #endif
+  #ifndef TINYRTOS_STACK_SIZE
+    #define TINYRTOS_STACK_SIZE  192
+  #endif
+  #define _TINYRTOS_RAM_WARN  6000
+  #define _TINYRTOS_PC3
 #else  // ATmega and others
   #ifndef TINYRTOS_MAX_TASKS
     #define TINYRTOS_MAX_TASKS   3

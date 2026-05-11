@@ -1,5 +1,4 @@
-# V1.1
+# V1.2
 
-* Merged with MiniRTOS – TinyRTOS now supports ATmega and tinyAVR 0/1/2-series MCUs with auto-detected defaults
-* Added RtosLock **rtos_lock()** and **rtos_unlock()** to safely share resources between tasks. Zero overhead if unused. (Binary mutex)
-* Added lock example **lockDemo.ino**
+* Added experimental ATmega2560/2561 support: 3-byte PC handled via `_TINYRTOS_PC3` in `initStack()`
+* Added broader MCU compatibility documentation: any AVR with up to 128 KB flash and 32 GPRs

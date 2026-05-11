@@ -1,4 +1,4 @@
-# TinyRTOS V1.1
+# TinyRTOS V1.2
 
 Cooperative task scheduler with resource locks for classic ATtiny and ATmega AVR MCUs.
 
@@ -6,7 +6,7 @@ Cooperative task scheduler with resource locks for classic ATtiny and ATmega AVR
 
 - ATTinyCore (Spence Konde) for classic ATtiny MCUs
 - megaTinyCore (Spence Konde) for tinyAVR 0/1/2-series MCUs
-- Arduino AVR Core for ATmega MCUs
+- Arduino AVR Core for ATmega MCUs (including experimental ATmega2560 support)
 - Board setting: millis()/micros() : Enabled
 
 ## API

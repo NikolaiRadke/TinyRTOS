@@ -7,47 +7,35 @@ with at least 256 bytes of RAM.
 Enables multiple tasks to run seemingly simultaneously on the popular microcontrollers with as little as 256 bytes of RAM.  
 
 🆕 What's new?  
-* **10.05.2026** Release **V1.1.0** merged with **MiniRTOS**, with resource locks and support for more MCUs. 
+* **11.05.2026** Release **V1.2.0** with experimental ATmega2560 support (3-byte PC).
     -- More news? Check the [newsblog](https://github.com/NikolaiRadke/TinyRTOS/blob/main/NEWS.md).
 
 ## Supported MCUs
 
-### Tested
+**Tested:**
 
-| MCU | Flash | RAM | Package |
-|---|---|---|---|
-| ATtiny45 | 4 KB | 256 B | DIP-8 |
-| ATtiny85 | 8 KB | 512 B | DIP-8 |
-| ATtiny44 | 4 KB | 256 B | DIP-14 |
-| ATtiny84 | 8 KB | 512 B | DIP-14 |
-| ATmega168 | 16 KB | 1 KB | DIP-28 |
-| ATmega328/P | 32 KB | 2 KB | DIP-28 |
-| ATmega32U4 | 32 KB | 2.5 KB | QFP-44 |
-
-Requires **ATTinyCore** (Spence Konde) for ATtiny MCUs, **Arduino AVR Core** for ATmega MCUs.
-
-### Supported but untested
-
-| MCU | Flash | RAM | Package |
-|---|---|---|---|
-| ATtiny441 | 4 KB | 256 B | DIP-14 |
-| ATtiny841 | 8 KB | 512 B | DIP-14 |
-| ATtiny461 | 4 KB | 256 B | DIP-20 |
-| ATtiny861 | 8 KB | 512 B | DIP-20 |
-| ATtiny4313 | 4 KB | 256 B | DIP-20 |
-
-Requires **ATTinyCore** (Spence Konde).
-
-### Supported but untested (SMD only)
-
-| Series | Example | Flash | RAM | Package |
+| MCU | Flash | RAM | Package | Board |
 |---|---|---|---|---|
-| tinyAVR 0/1/2 – 8-pin (x02, x12) | ATtiny412 | 4–8 KB | 256–512 B | SOIC-8 |
-| tinyAVR 0/1/2 – 14-pin (x04, x14, x24) | ATtiny1614 | 4–16 KB | 256 B–2 KB | SOIC-14 |
-| tinyAVR 0/1/2 – 20-pin (x06, x16, x26) | ATtiny3216 | 4–32 KB | 256 B–2 KB | SOIC-20 |
-| tinyAVR 0/1/2 – 24-pin (x07, x17, x27) | ATtiny3217 | 8–32 KB | 512 B–3 KB | SOIC-24 |
+| ATtiny45 | 4 KB | 256 B | DIP-8 | – |
+| ATtiny85 | 8 KB | 512 B | DIP-8 | – |
+| ATtiny44 | 4 KB | 256 B | DIP-14 | – |
+| ATtiny84 | 8 KB | 512 B | DIP-14 | – |
+| ATmega328P | 32 KB | 2 KB | DIP-28 | Arduino UNO |
 
-Requires **megaTinyCore** (Spence Konde). MCUs with less than 256 bytes RAM not supported.
+Any other ATtiny MCU with 32 general-purpose registers and at least 256 bytes of RAM
+should be compatible (e.g. ATtiny461, ATtiny861). ATtinys with only 16 registers
+(e.g. ATtiny13, ATtiny2313) or less RAN (ATtiny25) are **not** supported.
+   
+Any other AVR MCU with up to 128 KB flash should be compatible (e.g. ATmega88,
+ATmega1284P, ATmega32U4) – the kernel uses only standard AVR instructions and registers.
+
+**Experimental¹:**
+
+| MCU | Flash | RAM | Package | Board |
+|---|---|---|---|---|
+| ATmega2560 | 256 KB | 8 KB | TQFP-100 | Arduino Mega |
+
+¹ Not yet tested on hardware.
 
 ## Requirements
 - Arduino IDE with **ATTinyCore** (Spence Konde) for classic ATtiny MCUs
@@ -113,6 +101,13 @@ ATmega328:
 + kernel overhead         =  10 bytes
 ─────────────────────────────────────
 Total                     ≈ 586 bytes
+
+ATmega2560:
+4 tasks × 192 bytes stack = 768 bytes
++ kernel overhead         =  10 bytes
+─────────────────────────────────────
+Total                     ≈ 778 bytes
+
 ```
 
 Stack size and task count can be adjusted before including the library:
