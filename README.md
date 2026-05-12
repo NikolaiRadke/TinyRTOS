@@ -12,33 +12,19 @@ Enables multiple tasks to run seemingly simultaneously on the popular microcontr
 
 ## Supported MCUs
 
-**Tested:**
-
-| MCU | Flash | RAM | Package | Board |
-|---|---|---|---|---|
-| ATtiny45 | 4 KB | 256 B | DIP-8 | – |
-| ATtiny85 | 8 KB | 512 B | DIP-8 | – |
-| ATtiny44 | 4 KB | 256 B | DIP-14 | – |
-| ATtiny84 | 8 KB | 512 B | DIP-14 | – |
-| ATmega328P | 32 KB | 2 KB | DIP-28 | Arduino UNO |
-
-**Any other ATtiny MCU** with 32 general-purpose registers and at least 256 bytes of RAM
+* **Tested:** Attiny45/85/44/84, ATmega328 (Arduino Uno/Nano).
+  
+* **Any other ATtiny MCU** with 32 general-purpose registers and at least 256 bytes of RAM
 should be compatible (e.g. ATtiny461, ATtiny861). ATtinys with only 16 registers
 (e.g. ATtiny13, ATtiny2313) or less RAN (ATtiny25) are **not** supported.
    
-**Any other AVR MCU** with up to 128 KB flash should be compatible (e.g. ATmega88,
+* **Any other AVR MCU** with up to 128 KB flash should be compatible (e.g. ATmega88,
 ATmega1284P, ATmega32U4) – the kernel uses only standard AVR instructions and registers.
   
-**Newer AVR Dx MCUs** (e.g. AVR128DA28) should be compatible via DxCore, but are not yet tested.
+* **Newer AVR Dx MCUs** (e.g. AVR128DA28) should be compatible via DxCore, but are not yet tested.
   
-**Experimental¹:**
-
-| MCU | Flash | RAM | Package | Board |
-|---|---|---|---|---|
-| ATmega2560 | 256 KB | 8 KB | TQFP-100 | Arduino Mega |
-
-¹ Not yet tested on hardware.
-
+* **Experimental:**  ATmega2560 (No board available)
+  
 ## Requirements
 - Arduino IDE with **ATTinyCore** (Spence Konde) for classic ATtiny MCUs
 - Arduino IDE with **megaTinyCore** (Spence Konde) for tinyAVR 0/1/2-series MCUs
