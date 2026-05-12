@@ -7,8 +7,8 @@ with at least 256 bytes of RAM.
 Enables multiple tasks to run seemingly simultaneously on the popular microcontrollers with as little as 256 bytes of RAM.  
 
 🆕 What's new?  
-* **11.05.2026** Release **V1.2.0** with experimental ATmega2560 support (3-byte PC).  
-    -- More news? Check the [newsblog](https://github.com/NikolaiRadke/TinyRTOS/blob/main/NEWS.md).
+* **12.05.2026** TinyRTOS is now an official Arduino Library – install it directly via the Arduino IDE Library Manager.  
+      -- More news? Check the [newsblog](https://github.com/NikolaiRadke/TinyRTOS/blob/main/NEWS.md).
 
 ## Supported MCUs
 
@@ -30,6 +30,11 @@ ATmega1284P, ATmega32U4) – the kernel uses only standard AVR instructions and 
 - Arduino IDE with **megaTinyCore** (Spence Konde) for tinyAVR 0/1/2-series MCUs
 - Arduino IDE with **Arduino AVR Core** for ATmega MCUs
 - millis()/micros(): `Enabled`
+
+## Installation
+
+TinyRTOS can be installed directly via the Arduino IDE Library Manager.  
+Search for **TinyRTOS** and click *Install*.
 
 ## Quick Start
 
