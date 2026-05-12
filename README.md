@@ -1,7 +1,7 @@
 # TinyRTOS
 
 Unleash the power of multitasking *FreeRTOS*-like (Real Time Operating System) for your tiny MCU!  
-Well, kind of. TinyRTOS is a **cooperative task scheduler** for **ATtiny and ATmega AVR MCUs** 
+Well, kind of. TinyRTOS is a **cooperative task scheduler** for **8 Bit ATtiny and ATmega AVR MCUs** 
 with at least 256 bytes of RAM.
 
 Enables multiple tasks to run seemingly simultaneously on the popular microcontrollers with as little as 256 bytes of RAM.  
