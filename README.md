@@ -1,4 +1,4 @@
-![AI.duino](http://www.nikolairadke.de/aiduino/tinyrtos_banner.png)
+![TinyRTOS](http://www.nikolairadke.de/aiduino/tinyrtos_banner.png)
 
 # TinyRTOS
 
