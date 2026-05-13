@@ -1,3 +1,5 @@
+![AI.duino](http://www.nikolairadke.de/aiduino/tinyrtos_banner.png)
+
 # TinyRTOS
 
 Unleash the power of multitasking *FreeRTOS*-like (Real Time Operating System) for your tiny MCU!  
