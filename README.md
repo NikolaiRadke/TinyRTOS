@@ -115,6 +115,21 @@ Stack size and task count can be adjusted before including the library:
 
 > ⚠️ Minimum: 40 bytes per task. Deep call stacks require more.
 
+## Idle Sleep
+
+When all tasks are waiting in `rtos_delay()`, TinyRTOS puts the CPU to sleep
+until the next millisecond tick. Timer0 keeps running, so `millis()` stays
+accurate. Measured on an ATtiny85 at 8 MHz: current draw drops by half.
+
+Costs ~90 bytes of flash and 1 byte of RAM. To disable, uncomment in `TinyRTOS.h`:
+
+```cpp
+#define TINYRTOS_NO_IDLE_SLEEP
+```
+
+Worth doing on a 4 KB ATtiny when flash runs short, or when your sketch
+manages sleep modes itself.
+
 ## What TinyRTOS Is (and Is Not)
 
 TinyRTOS is a **cooperative task scheduler** – not an operating system. There is no memory protection, no process isolation, and no dynamic memory management. A misbehaving task can corrupt others and will not be caught.
