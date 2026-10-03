@@ -9,7 +9,7 @@ with at least **256 byte RAM**.
 Enables multiple tasks to run seemingly simultaneously on the popular microcontrollers with as little as 256 bytes of RAM.  
 
 🆕 What's new?  
-* **04.10.2026ÜÜ Release **V1.3.2** with missing rtos_lock() function.
+* **04.10.2026** Release **V1.3.2** with missing rtos_lock() function.
       -- More news? Check the [newsblog](https://github.com/NikolaiRadke/TinyRTOS/blob/main/NEWS.md).
 
 ## Supported MCUs
