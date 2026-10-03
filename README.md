@@ -132,7 +132,7 @@ manages sleep modes itself.
 
 ## What TinyRTOS Is (and Is Not)
 
-TinyRTOS is a **cooperative task scheduler** – not an operating system. There is no memory protection, no process isolation, and no dynamic memory management. A misbehaving task can corrupt others and will not be caught.
+TinyRTOS is a **cooperative task scheduler**, not an operating system. There is no memory protection, no process isolation, and no dynamic memory management. A misbehaving task can corrupt others and will not be caught.
 
 On an ATtiny45 with 256 bytes of RAM this is not a limitation but the only sensible approach. TinyRTOS replaces nested state machines with readable, linear task code. Nothing more, nothing less.  
 
