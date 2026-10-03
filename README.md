@@ -9,7 +9,7 @@ with at least **256 byte RAM**.
 Enables multiple tasks to run seemingly simultaneously on the popular microcontrollers with as little as 256 bytes of RAM.  
 
 🆕 What's new?  
-* **12.05.2026** TinyRTOS is now an official Arduino Library – install it directly via the Arduino IDE Library Manager.  
+* **03.10.2026** Release **V1.3.0** with automatic Idle-Sleep.
       -- More news? Check the [newsblog](https://github.com/NikolaiRadke/TinyRTOS/blob/main/NEWS.md).
 
 ## Supported MCUs
