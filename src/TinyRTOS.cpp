@@ -252,6 +252,12 @@ void rtos_delay(uint16_t ms) {
 #endif
 }
 
+void rtos_lock(RtosLock *lock) {
+    while (*lock)
+        rtos_yield();
+    *lock = 1;
+}
+
 void rtos_unlock(RtosLock *lock) {
     *lock = 0;
 }

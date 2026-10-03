@@ -1,5 +1,5 @@
 /*
- * TinyRTOS V1.3.1 – Cooperative Task Scheduler
+ * TinyRTOS V1.3.2 – Cooperative Task Scheduler
  * Nikolai Radke, 2026
  *
  * Footprint: ~500 bytes flash (kernel) | 3 bytes RAM + 2 bytes and TINYRTOS_STACK_SIZE per task

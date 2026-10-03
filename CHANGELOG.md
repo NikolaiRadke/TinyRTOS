@@ -1,3 +1,3 @@
-# V1.3.1
+# V1.3.2
 
-* Idle sleep now uses a counter instead of a bitmask – halves its flash cost (~45 instead of ~90 bytes), no task limit
+* Fixed missing rtos_lock() – 1.3.1 did not link with resource locks

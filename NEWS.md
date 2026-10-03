@@ -2,6 +2,7 @@
 
 ## 2026
 
+* **04.10.2026ÜÜ Release **V1.3.2** with missing rtos_lock() function.
 * **03.10.2026** Release **V1.3.1** – tighter Idle-Sleep.
 * **03.10.2026** Release **V1.3.0** with automatic Idle-Sleep.
 * **12.05.2026** TinyRTOS is now an official Arduino Library – install it directly via the Arduino IDE Library Manager.  
