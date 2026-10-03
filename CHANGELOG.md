@@ -1,5 +1,3 @@
-# V1.3
+# V1.3.1
 
-* Added automatic idle sleep – halves current draw when all tasks wait. Disable with **TINYRTOS_NO_IDLE_SLEEP**
-* MCU defaults now selected by available SRAM, not core macros
-* Corrected RAM figures in documentation
+* Idle sleep now uses a counter instead of a bitmask – halves its flash cost (~45 instead of ~90 bytes), no task limit

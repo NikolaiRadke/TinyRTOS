@@ -9,7 +9,7 @@ with at least **256 byte RAM**.
 Enables multiple tasks to run seemingly simultaneously on the popular microcontrollers with as little as 256 bytes of RAM.  
 
 🆕 What's new?  
-* **03.10.2026** Release **V1.3.0** with automatic Idle-Sleep.
+* **03.10.2026** Release **V1.3.1** – tighter Idle-Sleep.
       -- More news? Check the [newsblog](https://github.com/NikolaiRadke/TinyRTOS/blob/main/NEWS.md).
 
 ## Supported MCUs
@@ -121,7 +121,7 @@ When all tasks are waiting in `rtos_delay()`, TinyRTOS puts the CPU to sleep
 until the next millisecond tick. Timer0 keeps running, so `millis()` stays
 accurate. Measured on an ATtiny85 at 8 MHz: current draw drops by half.
 
-Costs ~90 bytes of flash and 1 byte of RAM. To disable, uncomment in `TinyRTOS.h`:
+Costs ~45 bytes of flash and 1 byte of RAM. To disable, uncomment in `TinyRTOS.h`:
 
 ```cpp
 #define TINYRTOS_NO_IDLE_SLEEP

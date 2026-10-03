@@ -1,5 +1,5 @@
 /*
- * TinyRTOS V1.3 – Cooperative Task Scheduler
+ * TinyRTOS V1.3.1 – Cooperative Task Scheduler
  * Nikolai Radke, 2026
  *
  * Footprint: ~500 bytes flash (kernel) | 3 bytes RAM + 2 bytes and TINYRTOS_STACK_SIZE per task
@@ -28,7 +28,7 @@
 
 #pragma once
 
-//#define TINYRTOS_NO_IDLE_SLEEP  // Uncomment to disable idle sleep: frees ~90 bytes flash, raises current draw
+//#define TINYRTOS_NO_IDLE_SLEEP  // Uncomment to disable idle sleep: frees ~45 bytes flash, raises current draw
 
 #include <stdint.h>
 #include <avr/io.h>
@@ -65,9 +65,6 @@
 
 #ifndef TINYRTOS_NO_IDLE_SLEEP
   #define TINYRTOS_IDLE_SLEEP
-  #if TINYRTOS_MAX_TASKS > 8
-    #error "Idle sleep supports up to 8 tasks. Define TINYRTOS_NO_IDLE_SLEEP."
-  #endif
 #endif
 
 #if TINYRTOS_STACK_SIZE < 40
