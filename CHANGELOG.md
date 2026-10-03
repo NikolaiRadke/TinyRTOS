@@ -1,4 +1,5 @@
-# V1.2
+# V1.3
 
-* Added experimental ATmega2560/2561 support: 3-byte PC handled via `_TINYRTOS_PC3` in `initStack()`
-* Added broader MCU compatibility documentation: any AVR with up to 128 KB flash and 32 GPRs
+* Added automatic idle sleep – halves current draw when all tasks wait. Disable with **TINYRTOS_NO_IDLE_SLEEP**
+* MCU defaults now selected by available SRAM, not core macros
+* Corrected RAM figures in documentation

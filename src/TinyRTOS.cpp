@@ -215,10 +215,43 @@ void __attribute__((naked)) rtos_run(void) {
     );
 }
 
+#ifdef TINYRTOS_IDLE_SLEEP
+#ifdef SMCR
+  #define _MR_SLEEP_REG  SMCR
+#else
+  #define _MR_SLEEP_REG  MCUCR
+#endif
+#ifdef SM2
+  #define _MR_SM_MASK ((uint8_t)(_BV(SM0) | _BV(SM1) | _BV(SM2)))
+#else
+  #define _MR_SM_MASK ((uint8_t)(_BV(SM0) | _BV(SM1)))
+#endif
+
+static uint8_t _mr_wait = 0; // Bit i set = task i waits in rtos_delay()
+
+static inline void _mr_idle(void) {
+    _MR_SLEEP_REG = (_MR_SLEEP_REG & ~_MR_SM_MASK) | _BV(SE); // SM = 000: idle
+    __asm__ __volatile__ ("sleep");
+    _MR_SLEEP_REG &= (uint8_t)~_BV(SE);
+}
+#endif
+
 void rtos_delay(uint16_t ms) {
     uint32_t start = millis();
-    while (millis() - start < ms)
+#ifdef TINYRTOS_IDLE_SLEEP
+    uint8_t bit = (uint8_t)(1 << _mr_cur);
+    uint8_t all = (uint8_t)((1 << _mr_n) - 1);
+#endif
+    while (millis() - start < ms) {
+#ifdef TINYRTOS_IDLE_SLEEP
+        _mr_wait |= bit;
+        if (_mr_wait == all) _mr_idle();
+#endif
         rtos_yield();
+    }
+#ifdef TINYRTOS_IDLE_SLEEP
+    _mr_wait &= (uint8_t)~bit;
+#endif
 }
 
 void rtos_lock(RtosLock *lock) {

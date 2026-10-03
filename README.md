@@ -9,7 +9,7 @@ with at least **256 byte RAM**.
 Enables multiple tasks to run seemingly simultaneously on the popular microcontrollers with as little as 256 bytes of RAM.  
 
 🆕 What's new?  
-* **13.05.2026** TinyRTOS now has a fancy logo!  
+* **12.05.2026** TinyRTOS is now an official Arduino Library – install it directly via the Arduino IDE Library Manager.  
       -- More news? Check the [newsblog](https://github.com/NikolaiRadke/TinyRTOS/blob/main/NEWS.md).
 
 ## Supported MCUs
@@ -86,16 +86,16 @@ PB3 and PB4 are free I/O pins used in the example sketch.
 ```
 ATtiny:
 2 tasks × 64 bytes stack = 128 bytes
-+ kernel overhead        =  10 bytes
++ kernel overhead        =   7 bytes
 + program variables      =   5 bytes
 ────────────────────────────────────
-Total                    ≈ 143 bytes 
+Total                    ≈ 140 bytes 
 
 ATmega328:
 3 tasks × 192 bytes stack = 576 bytes
-+ kernel overhead         =  10 bytes
++ kernel overhead         =   9 bytes
 ─────────────────────────────────────
-Total                     ≈ 586 bytes
+Total                     ≈ 585 bytes
 
 ATmega2560:
 4 tasks × 192 bytes stack = 768 bytes

@@ -1,8 +1,8 @@
 /*
- * TinyRTOS V1.1 – Cooperative Task Scheduler
+ * TinyRTOS V1.3 – Cooperative Task Scheduler
  * Nikolai Radke, 2026
  *
- * Footprint: ~600 bytes flash | 10 bytes RAM + TINYRTOS_STACK_SIZE per task
+ * Footprint: ~500 bytes flash (kernel) | 3 bytes RAM + 2 bytes and TINYRTOS_STACK_SIZE per task
  *
  * Supported MCUs:
  * ATtiny44/45/84/85 and other ATtiny MCUs with 32 GPRs and ≥256 bytes RAM.
@@ -11,13 +11,13 @@
  * 
  * RAM usage example (ATtiny85):
  *   2 tasks × 64 bytes stack  = 128 bytes
- *   + kernel overhead         =  10 bytes
- *   Total                     ≈ 138 bytes
+ *   + kernel overhead         =   7 bytes
+ *   Total                     ≈ 135 bytes
  *
  * RAM usage example (ATmega328):
  *   3 tasks × 192 bytes stack = 576 bytes
- *   + kernel overhead         =  10 bytes
- *   Total                     ≈ 586 bytes
+ *   + kernel overhead         =   9 bytes
+ *   Total                     ≈ 585 bytes
  *
  * Minimum stack size per task: 40 bytes kernel overhead
  *   + call depth + ~20 bytes for timer0 ISR (millis)
@@ -27,9 +27,16 @@
  *               millis() support must be enabled */
 
 #pragma once
-#include <stdint.h>
 
-#if defined(ATTINYCORE) || defined(MEGATINYCORE)
+//#define TINYRTOS_NO_IDLE_SLEEP  // Uncomment to disable idle sleep: frees ~90 bytes flash, raises current draw
+
+#include <stdint.h>
+#include <avr/io.h>
+
+#if (RAMEND - RAMSTART + 1) <= 512
+  #ifndef TINYRTOS_MAX_TASKS
+    #define TINYRTOS_MAX_TASKS   2
+  #endif
   #ifndef TINYRTOS_MAX_TASKS
     #define TINYRTOS_MAX_TASKS   2
   #endif
@@ -54,6 +61,13 @@
     #define TINYRTOS_STACK_SIZE  192
   #endif
   #define _TINYRTOS_RAM_WARN  800
+#endif
+
+#ifndef TINYRTOS_NO_IDLE_SLEEP
+  #define TINYRTOS_IDLE_SLEEP
+  #if TINYRTOS_MAX_TASKS > 8
+    #error "Idle sleep supports up to 8 tasks. Define TINYRTOS_NO_IDLE_SLEEP."
+  #endif
 #endif
 
 #if TINYRTOS_STACK_SIZE < 40

@@ -14,11 +14,10 @@
  *   BOD:               Disabled  (saves flash)
  *   LTO:               Enabled (saves flash)
  *
- * RAM usage:
  *   2 tasks × 64 bytes stack = 128 Bytes
- *   + kernel oerhead         =  10 Bytes
- *   + program  variables     =   5 Bytes
- *   Total                      143 Bytes
+ *   + kernel overhead        =   7 Bytes
+ *   + millis()               =   5 Bytes
+ *   Total                      144 Bytes
  */
 
 #include "TinyRTOS.h"
