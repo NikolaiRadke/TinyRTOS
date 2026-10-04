@@ -2,7 +2,8 @@
 
 ## 2026
 
-* **04.10.2026** Release **V1.3.3** with fixed Idle-Sleep compile error on tinyAVR 0/1/2 and AVR Dx (megaTinyCore, DxCore)  
+* **04.10.2026** Release **V1.3.3** with fixed Idle-Sleep compile error on tinyAVR 0/1/2 and AVR Dx (megaTinyCore, DxCore)
+* **04.10.2020** Release **V1.3.2** with fixed missing rtos_lock() – 1.3.1 did not link with resource locks
 * **03.10.2026** Release **V1.3.1** with tighter Idle-Sleep.
 * **03.10.2026** Release **V1.3.0** with automatic Idle-Sleep.
 * **12.05.2026** TinyRTOS is now an official Arduino Library – install it directly via the Arduino IDE Library Manager.  
