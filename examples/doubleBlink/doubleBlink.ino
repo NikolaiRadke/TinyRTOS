@@ -14,10 +14,10 @@
  *   BOD:               Disabled  (saves flash)
  *   LTO:               Enabled (saves flash)
  *
- *   2 tasks × 64 bytes stack = 128 Bytes
- *   + kernel overhead        =   7 Bytes
- *   + millis()               =   5 Bytes
- *   Total                      144 Bytes
+ *   2 tasks × 64 bytes stack  = 128 bytes
+ *   + kernel overhead         =   7 bytes
+ *   + millis() (Arduino core) =   9 bytes
+ *   Total                       144 bytes
  */
 
 #include "TinyRTOS.h"

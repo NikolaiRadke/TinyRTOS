@@ -9,7 +9,7 @@
  * ATmega328P and any other AVR MCU with up to 128 KB flash.
  * ATmega2560/2561 (experimental, 3-byte PC).
  *
- * RAM usage example (ATtiny85):
+ * RAM usage example (ATtiny85, TinyRTOS only – the Arduino core adds ~9 bytes):
  *   2 tasks × 64 bytes stack  = 128 bytes
  *   + kernel overhead         =   7 bytes
  *   Total                     ≈ 135 bytes

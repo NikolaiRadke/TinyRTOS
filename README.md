@@ -84,14 +84,14 @@ PB3 and PB4 are free I/O pins used in the example sketch.
 ## RAM Usage
 
 ```
-ATtiny:
-2 tasks × 64 bytes stack = 128 bytes
-+ kernel overhead        =   7 bytes
-+ program variables      =   5 bytes
-────────────────────────────────────
-Total                    ≈ 140 bytes 
+ATtiny85 (doubleBlink):
+2 tasks × 64 bytes stack  = 128 bytes
++ kernel overhead         =   7 bytes
++ millis() (Arduino core) =   9 bytes
+─────────────────────────────────────
+Total                     = 144 bytes
 
-ATmega328:
+ATmega328 (without Serial):
 3 tasks × 192 bytes stack = 576 bytes
 + kernel overhead         =   9 bytes
 ─────────────────────────────────────
@@ -99,9 +99,9 @@ Total                     ≈ 585 bytes
 
 ATmega2560:
 4 tasks × 192 bytes stack = 768 bytes
-+ kernel overhead         =  10 bytes
++ kernel overhead         =  11 bytes
 ─────────────────────────────────────
-Total                     ≈ 778 bytes
+Total                     ≈ 779 bytes
 
 ```
 

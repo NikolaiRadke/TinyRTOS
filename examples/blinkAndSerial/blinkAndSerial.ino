@@ -18,10 +18,11 @@
  *   Board: Arduino Uno, Nano or Leonardo
  *   Baud:  9600
  *
- * RAM usage for TinyRTOS:
+ * RAM usage:
  *   3 tasks × 192 bytes stack = 576 bytes
- *   + kernel overhead         =  10 bytes
- *   Total                     ≈ 586 bytes 
+ *   + kernel overhead         =   9 bytes
+ *   + Serial buffers + millis = 238 bytes
+ *   Total                     = 823 bytes
  */
 
 #include "TinyRTOS.h"
