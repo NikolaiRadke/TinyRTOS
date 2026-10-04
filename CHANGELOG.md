@@ -1,3 +1,3 @@
-# V1.3.2
+# V1.3.3
 
-* Fixed missing rtos_lock() – 1.3.1 did not link with resource locks
+* Fixed idle sleep compile error on tinyAVR 0/1/2 and AVR Dx (megaTinyCore, DxCore)

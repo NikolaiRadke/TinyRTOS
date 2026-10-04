@@ -216,6 +216,15 @@ void __attribute__((naked)) rtos_run(void) {
 }
 
 #ifdef TINYRTOS_IDLE_SLEEP
+static uint8_t _mr_wait = 0; // Number of tasks waiting in rtos_delay()
+
+#ifdef SLPCTRL  // tinyAVR 0/1/2, AVR Dx: dedicated sleep controller
+static inline void _mr_idle(void) {
+    SLPCTRL.CTRLA = SLPCTRL_SMODE_IDLE_gc | SLPCTRL_SEN_bm;
+    __asm__ __volatile__ ("sleep");
+    SLPCTRL.CTRLA = 0;
+}
+#else           // Classic AVR: SMCR (ATmega) or MCUCR (ATtiny)
 #ifdef SMCR
   #define _MR_SLEEP_REG  SMCR
 #else
@@ -226,14 +235,12 @@ void __attribute__((naked)) rtos_run(void) {
 #else
   #define _MR_SM_MASK ((uint8_t)(_BV(SM0) | _BV(SM1)))
 #endif
-
-static uint8_t _mr_wait = 0;
-
 static inline void _mr_idle(void) {
-    _MR_SLEEP_REG = (_MR_SLEEP_REG & ~_MR_SM_MASK) | _BV(SE);
+    _MR_SLEEP_REG = (_MR_SLEEP_REG & ~_MR_SM_MASK) | _BV(SE); // SM = 000: idle
     __asm__ __volatile__ ("sleep");
     _MR_SLEEP_REG &= (uint8_t)~_BV(SE);
 }
+#endif
 #endif
 
 void rtos_delay(uint16_t ms) {
