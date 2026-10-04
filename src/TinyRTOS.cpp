@@ -2,23 +2,26 @@
  * TinyRTOS.cpp – Cooperative kernel for AVR MCUs
  * Nikolai Radke, 2026
  *
- * The AVR instruction set is identical across all supported MCUs:
- * 32 registers, same stack mechanism. ATtiny44/45/84/85 and ATmega MCUs
- * with up to 128 KB flash use a 2-byte program counter. The ATmega2560/2561
- * uses a 3-byte program counter – initStack handles both cases via _TINYRTOS_PC3.
+ * Context switch
+ * rtos_yield() is only ever called from C code, never from an ISR. So the
+ * avr-gcc calling convention applies: r0, r18–r27, r30 and r31 are
+ * call-clobbered, r1 is always 0. Only the call-saved registers r2–r17,
+ * r28 and r29 must survive a switch – 18 bytes plus the return address.
  *
- * Important: ICALL requires a word address (byte address / 2).
- * Use pm_lo8/pm_hi8 instead of lo8/hi8 for function addresses in ICALL.
- * The ATmega2560 supports EICALL for targets beyond 128 KB, but ICALL
- * suffices here – _mr_schedule always resides in the first 128 KB.
+ * Frame of a suspended task, upwards from the saved SP:
+ *   +1..+18 : r29, r28, r17 ... r2
+ *   +19..   : return address (PCE first on 3-byte-PC MCUs, then PCH, PCL)
  *
- * Global variables use __attribute__((used)) to prevent the linker from
- * removing symbols that are only referenced in inline assembly.
+ * SREG is not saved: tasks always run with interrupts enabled. The SP is
+ * switched with "cli / out SPH / sei / out SPL". SEI takes effect after the
+ * next instruction, so the 16-bit SP write stays atomic.
+ *
+ * Global variables use __attribute__((used)) because they are referenced
+ * only from inline assembly.
  */
 
 #include "TinyRTOS.h"
 #include <avr/io.h>
-#include <string.h>
 #include <Arduino.h>
 
 uint8_t  _mr_stk[TINYRTOS_MAX_TASKS][TINYRTOS_STACK_SIZE] __attribute__((used));
@@ -26,78 +29,41 @@ uint8_t *_mr_spt[TINYRTOS_MAX_TASKS]                      __attribute__((used));
 uint8_t  _mr_n   __attribute__((used)) = 0;
 uint8_t  _mr_cur __attribute__((used)) = 0;
 
-extern "C" void __attribute__((naked, used)) _mr_schedule(void) {
-    asm volatile (
-        "lds  r24, _mr_cur          \n\t"
-        "inc  r24                   \n\t"
-        "lds  r25, _mr_n            \n\t"
-        "cp   r24, r25              \n\t"
-        "brlo .+2                   \n\t" // skip if r24 < r25
-        "clr  r24                   \n\t"
-        "sts  _mr_cur, r24          \n\t"
-        "ret                        \n\t"
-        ::: "memory"
-    );
-}
+#ifdef _TINYRTOS_PC3
+  #define _MR_FRAME 21  // 18 registers + PCE + PCH
+#else
+  #define _MR_FRAME 20  // 18 registers + PCH
+#endif
 
-// Build a fake context frame so _mr_restore + RET jumps into the task.
-//
-// Stack layout from _mr_spt (offsets +1..+35):
-//   +1..+31 : r31..r1 = 0
-//   +32     : r0 (as SREG) = 0x80 (I-bit set)
-//   +33     : r0 original  = 0
-//   +34     : PCH = func >> 8
-//   +35     : PCL = func & 0xFF
+// Build a fake frame so _mr_switch + RET jumps into the task.
+// _mr_stk lives in .bss and is zeroed at startup: the register start
+// values don't matter for a fresh task, PCE (3-byte PC) is already 0.
 
 static void initStack(uint8_t idx, TaskFunc func) {
-    uint8_t *s   = _mr_stk[idx];
-    uint16_t top = TINYRTOS_STACK_SIZE - 1;
-
-    memset(s, 0, TINYRTOS_STACK_SIZE);
-
-#ifdef _TINYRTOS_PC3
-    // 3-byte PC: RET pops PCE, PCH, PCL
-    // All tasks reside in the first 128 KB → PCE = 0
-    s[top]     = (uint16_t)func & 0xFF;
-    s[top - 1] = ((uint16_t)func >> 8) & 0xFF;
-    s[top - 2] = 0;     // PCE
-    s[top - 3] = 0;     // r0 original
-    s[top - 4] = 0x80;  // r0-as-SREG (I-bit)
-    _mr_spt[idx] = &s[top - 36];
-#else
-    s[top]     = (uint16_t)func & 0xFF;
-    s[top - 1] = ((uint16_t)func >> 8) & 0xFF;
-    s[top - 2] = 0;
-    s[top - 3] = 0x80;
-    _mr_spt[idx] = &s[top - 35];
-#endif
+    uint8_t *sp = &_mr_stk[idx][TINYRTOS_STACK_SIZE - 1 - _MR_FRAME];
+    sp[_MR_FRAME]     = (uint16_t)func & 0xFF;  // PCL
+    sp[_MR_FRAME - 1] = (uint16_t)func >> 8;    // PCH
+    _mr_spt[idx] = sp;
 }
 
-void rtos_add_task(TaskFunc func) {
+void __attribute__((noinline)) rtos_add_task(TaskFunc func) {
     if (_mr_n < TINYRTOS_MAX_TASKS)
         initStack(_mr_n++, func);
 }
 
-// Shared restore sequence – jumped to (not called) by rtos_yield and rtos_run.
-// Pops all registers from the current task stack, restores SREG, and returns
-// into the next task via RET.
+// Load SP from *X, restore registers and return into the task.
+// Jumped to (not called) by rtos_yield() and rtos_run().
 
-extern "C" void __attribute__((naked, used)) _mr_restore(void) {
-        asm volatile (
-        "pop  r31                       \n\t"
-        "pop  r30                       \n\t"
+extern "C" void __attribute__((naked, used)) _mr_switch(void) {
+    asm volatile (
+        "ld   r24, X+                   \n\t"
+        "ld   r25, X                    \n\t"
+        "cli                            \n\t"
+        "out  __SP_H__, r25             \n\t"
+        "sei                            \n\t" // effective after next instruction
+        "out  __SP_L__, r24             \n\t"
         "pop  r29                       \n\t"
         "pop  r28                       \n\t"
-        "pop  r27                       \n\t"
-        "pop  r26                       \n\t"
-        "pop  r25                       \n\t"
-        "pop  r24                       \n\t"
-        "pop  r23                       \n\t"
-        "pop  r22                       \n\t"
-        "pop  r21                       \n\t"
-        "pop  r20                       \n\t"
-        "pop  r19                       \n\t"
-        "pop  r18                       \n\t"
         "pop  r17                       \n\t"
         "pop  r16                       \n\t"
         "pop  r15                       \n\t"
@@ -114,30 +80,19 @@ extern "C" void __attribute__((naked, used)) _mr_restore(void) {
         "pop  r4                        \n\t"
         "pop  r3                        \n\t"
         "pop  r2                        \n\t"
-        "pop  r1                        \n\t"
-        "pop  r0                        \n\t"
-        "out  __SREG__, r0              \n\t"
-        "pop  r0                        \n\t"
         "ret                            \n\t"
         ::: "memory"
     );
 }
 
 // Context switch:
-//   1. Save all registers + SREG onto current task stack (33 pushes)
-//   2. Save SP to _mr_spt[_mr_cur]
-//   3. Call _mr_schedule() to update _mr_cur
-//   4. Load SP from _mr_spt[_mr_cur]
-//   5. Jump to _mr_restore → pops all registers, RET into next task
+//   1. Push call-saved registers onto the current task stack
+//   2. Store SP in _mr_spt[_mr_cur] – X then points to the next entry
+//   3. Advance _mr_cur round robin, reset X on wrap-around
+//   4. Jump to _mr_switch
 
-void __attribute__((naked)) rtos_yield(void) {
+void __attribute__((naked, used)) rtos_yield(void) {
     asm volatile (
-        "push r0                        \n\t"
-        "in   r0, __SREG__              \n\t"
-        "cli                            \n\t"
-        "push r0                        \n\t"
-        "push r1                        \n\t"
-        "clr  r1                        \n\t"
         "push r2                        \n\t"
         "push r3                        \n\t"
         "push r4                        \n\t"
@@ -154,63 +109,42 @@ void __attribute__((naked)) rtos_yield(void) {
         "push r15                       \n\t"
         "push r16                       \n\t"
         "push r17                       \n\t"
-        "push r18                       \n\t"
-        "push r19                       \n\t"
-        "push r20                       \n\t"
-        "push r21                       \n\t"
-        "push r22                       \n\t"
-        "push r23                       \n\t"
-        "push r24                       \n\t"
-        "push r25                       \n\t"
-        "push r26                       \n\t"
-        "push r27                       \n\t"
         "push r28                       \n\t"
         "push r29                       \n\t"
-        "push r30                       \n\t"
-        "push r31                       \n\t"
-        "lds  r24, _mr_cur              \n\t"
-        "lsl  r24                       \n\t"
-        "clr  r25                       \n\t"
+        "lds  r25, _mr_cur              \n\t"
         "ldi  r26, lo8(_mr_spt)         \n\t"
         "ldi  r27, hi8(_mr_spt)         \n\t"
-        "add  r26, r24                  \n\t"
-        "adc  r27, r25                  \n\t"
+        "add  r26, r25                  \n\t"
+        "adc  r27, __zero_reg__         \n\t"
+        "add  r26, r25                  \n\t"
+        "adc  r27, __zero_reg__         \n\t"
         "in   r24, __SP_L__             \n\t"
-        "in   r25, __SP_H__             \n\t"
-        "st   x+, r24                   \n\t"
-        "st   x,  r25                   \n\t"
-        "ldi  r30, pm_lo8(_mr_schedule) \n\t"
-        "ldi  r31, pm_hi8(_mr_schedule) \n\t"
-        "icall                          \n\t"
-        "lds  r24, _mr_cur              \n\t"
-        "lsl  r24                       \n\t"
-        "clr  r25                       \n\t"
+        "st   X+, r24                   \n\t"
+        "in   r24, __SP_H__             \n\t"
+        "st   X+, r24                   \n\t" // X -> _mr_spt[_mr_cur + 1]
+        "inc  r25                       \n\t"
+        "lds  r24, _mr_n                \n\t"
+        "cp   r25, r24                  \n\t"
+        "brlo 1f                        \n\t"
+        "clr  r25                       \n\t" // wrap around to task 0
         "ldi  r26, lo8(_mr_spt)         \n\t"
         "ldi  r27, hi8(_mr_spt)         \n\t"
-        "add  r26, r24                  \n\t"
-        "adc  r27, r25                  \n\t"
-        "ld   r24, x+                   \n\t"
-        "ld   r25, x                    \n\t"
-        "out  __SP_L__, r24             \n\t"
-        "out  __SP_H__, r25             \n\t"
-        "rjmp _mr_restore               \n\t" // restore registers and RET into next task
-        ::: "memory"
+        "1:                             \n\t"
+        "sts  _mr_cur, r25              \n\t"
+        "%~jmp _mr_switch               \n\t"
+        ::: "r18", "r19", "r20", "r21", "r22", "r23", "r24", "r25",
+            "r26", "r27", "r30", "r31", "memory"
     );
 }
 
-// Load SP from task 0 and jump to _mr_restore.
+// Point X at task 0 and jump to _mr_switch.
 // No save needed – the Arduino stack is abandoned from here.
 
 void __attribute__((naked)) rtos_run(void) {
     asm volatile (
-        "cli                            \n\t"
         "ldi  r26, lo8(_mr_spt)         \n\t"
         "ldi  r27, hi8(_mr_spt)         \n\t"
-        "ld   r24, x+                   \n\t"
-        "ld   r25, x                    \n\t"
-        "out  __SP_L__, r24             \n\t"
-        "out  __SP_H__, r25             \n\t"
-        "rjmp _mr_restore               \n\t" // restore registers and RET into task 0
+        "%~jmp _mr_switch               \n\t"
         ::: "memory"
     );
 }
@@ -243,14 +177,19 @@ static inline void _mr_idle(void) {
 #endif
 #endif
 
+// 16-bit arithmetic is exact here: ms is 16 bit, the unsigned
+// subtraction handles the wrap-around of millis().
+// Idle sleep happens only in task 0's turn: after each tick every task
+// checks its deadline once before the CPU sleeps again.
+
 void rtos_delay(uint16_t ms) {
-    uint32_t start = millis();
+    uint16_t start = (uint16_t)millis();
 #ifdef TINYRTOS_IDLE_SLEEP
     _mr_wait++;
 #endif
-    while (millis() - start < ms) {
+    while ((uint16_t)((uint16_t)millis() - start) < ms) {
 #ifdef TINYRTOS_IDLE_SLEEP
-        if (_mr_wait == _mr_n) _mr_idle();
+        if (_mr_wait == _mr_n && _mr_cur == 0) _mr_idle(); // once per round
 #endif
         rtos_yield();
     }

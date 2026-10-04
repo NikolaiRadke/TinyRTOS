@@ -1,14 +1,14 @@
 /*
- * TinyRTOS V1.3.3 – Cooperative Task Scheduler
+ * TinyRTOS V1.4.0 – Cooperative Task Scheduler
  * Nikolai Radke, 2026
  *
- * Footprint: ~500 bytes flash (kernel) | 3 bytes RAM + 2 bytes and TINYRTOS_STACK_SIZE per task
+ * Footprint: ~350 bytes flash (kernel) | 3 bytes RAM + 2 bytes and TINYRTOS_STACK_SIZE per task
  *
  * Supported MCUs:
  * ATtiny44/45/84/85 and other ATtiny MCUs with 32 GPRs and ≥256 bytes RAM.
  * ATmega328P and any other AVR MCU with up to 128 KB flash.
  * ATmega2560/2561 (experimental, 3-byte PC).
- * 
+ *
  * RAM usage example (ATtiny85):
  *   2 tasks × 64 bytes stack  = 128 bytes
  *   + kernel overhead         =   7 bytes
@@ -19,7 +19,7 @@
  *   + kernel overhead         =   9 bytes
  *   Total                     ≈ 585 bytes
  *
- * Minimum stack size per task: 40 bytes kernel overhead
+ * Minimum stack size per task: 20 bytes context frame
  *   + call depth + ~20 bytes for timer0 ISR (millis)
  *   64 bytes recommended for simple tasks without Serial
  *
@@ -27,8 +27,7 @@
  *               millis() support must be enabled */
 
 #pragma once
-
-//#define TINYRTOS_NO_IDLE_SLEEP  // Uncomment to disable idle sleep: frees ~45 bytes flash, raises current draw
+//#define TINYRTOS_NO_IDLE_SLEEP  // Uncomment to disable idle sleep: frees ~55 bytes flash, raises current draw
 
 #include <stdint.h>
 #include <avr/io.h>
@@ -37,14 +36,11 @@
   #ifndef TINYRTOS_MAX_TASKS
     #define TINYRTOS_MAX_TASKS   2
   #endif
-  #ifndef TINYRTOS_MAX_TASKS
-    #define TINYRTOS_MAX_TASKS   2
-  #endif
   #ifndef TINYRTOS_STACK_SIZE
     #define TINYRTOS_STACK_SIZE  64
   #endif
   #define _TINYRTOS_RAM_WARN  150
-#elif FLASHEND > 0x1FFFF  // 3-Byte-PC: ATmega2560/2561
+#elif FLASHEND > 0x1FFFF  // 3-byte PC: ATmega2560/2561
   #ifndef TINYRTOS_MAX_TASKS
     #define TINYRTOS_MAX_TASKS   4
   #endif
@@ -84,7 +80,8 @@ void rtos_add_task(TaskFunc func);
 // At least one task must be registered before calling.
 void rtos_run(void);
 
-// Cooperatively yield the CPU. Call from within a task
+// Cooperatively yield the CPU. Call from within a task.
+// Always returns with interrupts enabled.
 void rtos_yield(void);
 
 // Wait ms milliseconds, yielding the CPU while waiting

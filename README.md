@@ -3,14 +3,14 @@
 # TinyRTOS
 
 Unleash the power of multitasking *FreeRTOS*-like (Real Time Operating System) for your tiny MCU!  
-Well, kind of. TinyRTOS is a TinyRTOS is a **cooperative task scheduler** for **8-bit AVR MCUs**
+Well, kind of. TinyRTOS is a **cooperative task scheduler** for **8-bit AVR MCUs**
 with at least **256 byte RAM**.
 
 Enables multiple tasks to run seemingly simultaneously on the popular microcontrollers with as little as 256 bytes of RAM.  
 
 🆕 What's new?  
-* **04.10.2026** Release **V1.3.3** with fiexd idle sleep compile error on tinyAVR 0/1/2 and AVR Dx (megaTinyCore, DxCore)    
-      -- More news? Check the [newsblog](https://github.com/NikolaiRadke/TinyRTOS/blob/main/NEWS.md).
+* **04.10.2026** Release **V1.4.0** with a 30 % smaller kernel and exact idle sleep timing.  
+    -- More news? Check the [newsblog](https://github.com/NikolaiRadke/TinyRTOS/blob/main/NEWS.md).
 
 ## Supported MCUs
 
@@ -121,7 +121,7 @@ When all tasks are waiting in `rtos_delay()`, TinyRTOS puts the CPU to sleep
 until the next millisecond tick. Timer0 keeps running, so `millis()` stays
 accurate. Measured on an ATtiny85 at 8 MHz: current draw drops by half.
 
-Costs ~45 bytes of flash and 1 byte of RAM. To disable, uncomment in `TinyRTOS.h`:
+Costs ~55 bytes of flash and 1 byte of RAM. To disable, uncomment in `TinyRTOS.h`:
 
 ```cpp
 #define TINYRTOS_NO_IDLE_SLEEP
@@ -145,7 +145,7 @@ So why call it an **RTOS?** Because *TinyCooperativeRoundRobinTaskScheduler* or 
 
 1. Never use `delay()` – always use `rtos_delay()`
 2. No long loops without `rtos_yield()` in between
-3. Never call `rtos_yield()` from an ISR
+3. Never call `rtos_yield()` from an ISR or with interrupts disabled, it always returns with interrupts enabled
 4. Always call `rtos_unlock()` – a missing unlock blocks the other task forever.
 5. Tasks must be infinite loops – returning causes undefined behavior
 

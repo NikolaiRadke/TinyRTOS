@@ -1,4 +1,4 @@
-# TinyRTOS V1.3.3
+# TinyRTOS V1.4.0
 
 Cooperative task scheduler with resource locks for classic ATtiny and ATmega AVR MCUs.
 
@@ -25,7 +25,7 @@ Cooperative task scheduler with resource locks for classic ATtiny and ATmega AVR
 
 1. Never use `delay()` – always use `rtos_delay()`
 2. No long loops without `rtos_yield()` in between
-3. Never call `rtos_yield()` from an ISR
+3. Never call `rtos_yield()` from an ISR or with interrupts disabled, it always returns with interrupts enabled
 4. Always call `rtos_unlock()` – a missing unlock blocks the other task forever.
 5. Tasks must be infinite loops – returning causes undefined behavior
 
