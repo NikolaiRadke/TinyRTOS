@@ -2,8 +2,7 @@
 
 ## 2026
 
-* **04.19.2026**
-* **04.10.2026** Release **V1.3.3** with fiexd idle sleep compile error on tinyAVR 0/1/2 and AVR Dx (megaTinyCore, DxCore)
+* **04.10.2026** Release **V1.3.3** with fiexd idle sleep compile error on tinyAVR 0/1/2 and AVR Dx (megaTinyCore, DxCore)  
 * **03.10.2026** Release **V1.3.1** with tighter Idle-Sleep.
 * **03.10.2026** Release **V1.3.0** with automatic Idle-Sleep.
 * **12.05.2026** TinyRTOS is now an official Arduino Library – install it directly via the Arduino IDE Library Manager.  
