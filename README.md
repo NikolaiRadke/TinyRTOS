@@ -18,7 +18,8 @@ Enables multiple tasks to run seemingly simultaneously on the popular microcontr
   
 * **Any other ATtiny MCU** with 32 general-purpose registers and at least 256 bytes of RAM
 should be compatible (e.g. ATtiny461, ATtiny861). ATtinys with only 16 registers
-(e.g. ATtiny13, ATtiny2313) or less than 256 Byte RAM (ATtiny25) are **not** supported.
+(ATtiny4/5/9/10/20/40/102/104) or less than 256 bytes of RAM (e.g. ATtiny13,
+ATtiny2313, ATtiny25) are **not** supported.
    
 * **Any other AVR MCU** with up to 128 KB flash should be compatible (e.g. ATmega88,
 ATmega1284P, ATmega32U4) – the kernel uses only standard AVR instructions and registers.
