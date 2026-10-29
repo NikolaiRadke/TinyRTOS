@@ -16,6 +16,9 @@
  * switched with "cli / out SPH / sei / out SPL". SEI takes effect after the
  * next instruction, so the 16-bit SP write stays atomic.
  *
+ * Task 0 runs on the Arduino stack, which is unused after setup() anyway.
+ * Only tasks 1..n-1 get a stack in _mr_stk.
+ *
  * Global variables use __attribute__((used)) because they are referenced
  * only from inline assembly.
  */
@@ -24,8 +27,8 @@
 #include <avr/io.h>
 #include <Arduino.h>
 
-uint8_t  _mr_stk[TINYRTOS_MAX_TASKS][TINYRTOS_STACK_SIZE] __attribute__((used));
-uint8_t *_mr_spt[TINYRTOS_MAX_TASKS]                      __attribute__((used));
+uint8_t  _mr_stk[TINYRTOS_MAX_TASKS - 1][TINYRTOS_STACK_SIZE] __attribute__((used));
+uint8_t *_mr_spt[TINYRTOS_MAX_TASKS]                          __attribute__((used));
 uint8_t  _mr_n   __attribute__((used)) = 0;
 uint8_t  _mr_cur __attribute__((used)) = 0;
 
@@ -35,61 +38,30 @@ uint8_t  _mr_cur __attribute__((used)) = 0;
   #define _MR_FRAME 20  // 18 registers + PCH
 #endif
 
-// Build a fake frame so _mr_switch + RET jumps into the task.
+// Tasks 1..n-1 get a fake frame so the switch + RET jumps into the task.
 // _mr_stk lives in .bss and is zeroed at startup: the register start
-// values don't matter for a fresh task, PCE (3-byte PC) is already 0.
-
-static void initStack(uint8_t idx, TaskFunc func) {
-    uint8_t *sp = &_mr_stk[idx][TINYRTOS_STACK_SIZE - 1 - _MR_FRAME];
-    sp[_MR_FRAME]     = (uint16_t)func & 0xFF;  // PCL
-    sp[_MR_FRAME - 1] = (uint16_t)func >> 8;    // PCH
-    _mr_spt[idx] = sp;
-}
+// values don't matter, PCE (3-byte PC) is already 0.
+// Task 0 only stores its entry address, rtos_run() calls it directly.
 
 void __attribute__((noinline)) rtos_add_task(TaskFunc func) {
-    if (_mr_n < TINYRTOS_MAX_TASKS)
-        initStack(_mr_n++, func);
-}
-
-// Load SP from *X, restore registers and return into the task.
-// Jumped to (not called) by rtos_yield() and rtos_run().
-
-extern "C" void __attribute__((naked, used)) _mr_switch(void) {
-    asm volatile (
-        "ld   r24, X+                   \n\t"
-        "ld   r25, X                    \n\t"
-        "cli                            \n\t"
-        "out  __SP_H__, r25             \n\t"
-        "sei                            \n\t" // effective after next instruction
-        "out  __SP_L__, r24             \n\t"
-        "pop  r29                       \n\t"
-        "pop  r28                       \n\t"
-        "pop  r17                       \n\t"
-        "pop  r16                       \n\t"
-        "pop  r15                       \n\t"
-        "pop  r14                       \n\t"
-        "pop  r13                       \n\t"
-        "pop  r12                       \n\t"
-        "pop  r11                       \n\t"
-        "pop  r10                       \n\t"
-        "pop  r9                        \n\t"
-        "pop  r8                        \n\t"
-        "pop  r7                        \n\t"
-        "pop  r6                        \n\t"
-        "pop  r5                        \n\t"
-        "pop  r4                        \n\t"
-        "pop  r3                        \n\t"
-        "pop  r2                        \n\t"
-        "ret                            \n\t"
-        ::: "memory"
-    );
+    uint8_t n = _mr_n;
+    if (n < TINYRTOS_MAX_TASKS) {
+        uint8_t *sp = (uint8_t *)(uintptr_t)func;
+        if (n) {
+            sp = &_mr_stk[n - 1][TINYRTOS_STACK_SIZE - 1 - _MR_FRAME];
+            sp[_MR_FRAME]     = (uint16_t)func & 0xFF;  // PCL
+            sp[_MR_FRAME - 1] = (uint16_t)func >> 8;    // PCH
+        }
+        _mr_spt[n] = sp;
+        _mr_n = n + 1;
+    }
 }
 
 // Context switch:
 //   1. Push call-saved registers onto the current task stack
 //   2. Store SP in _mr_spt[_mr_cur] – X then points to the next entry
 //   3. Advance _mr_cur round robin, reset X on wrap-around
-//   4. Jump to _mr_switch
+//   4. Load the next SP from *X, restore registers, RET into the task
 
 void __attribute__((naked, used)) rtos_yield(void) {
     asm volatile (
@@ -131,31 +103,54 @@ void __attribute__((naked, used)) rtos_yield(void) {
         "ldi  r27, hi8(_mr_spt)         \n\t"
         "1:                             \n\t"
         "sts  _mr_cur, r25              \n\t"
-        "%~jmp _mr_switch               \n\t"
+        "ld   r24, X+                   \n\t" // SP of the next task
+        "ld   r25, X                    \n\t"
+        "cli                            \n\t"
+        "out  __SP_H__, r25             \n\t"
+        "sei                            \n\t" // effective after next instruction
+        "out  __SP_L__, r24             \n\t"
+        "pop  r29                       \n\t"
+        "pop  r28                       \n\t"
+        "pop  r17                       \n\t"
+        "pop  r16                       \n\t"
+        "pop  r15                       \n\t"
+        "pop  r14                       \n\t"
+        "pop  r13                       \n\t"
+        "pop  r12                       \n\t"
+        "pop  r11                       \n\t"
+        "pop  r10                       \n\t"
+        "pop  r9                        \n\t"
+        "pop  r8                        \n\t"
+        "pop  r7                        \n\t"
+        "pop  r6                        \n\t"
+        "pop  r5                        \n\t"
+        "pop  r4                        \n\t"
+        "pop  r3                        \n\t"
+        "pop  r2                        \n\t"
+        "ret                            \n\t"
         ::: "r18", "r19", "r20", "r21", "r22", "r23", "r24", "r25",
             "r26", "r27", "r30", "r31", "memory"
     );
 }
 
-// Point X at task 0 and jump to _mr_switch.
-// No save needed – the Arduino stack is abandoned from here.
+// Task 0 runs on the Arduino stack, which is unused after setup() anyway.
+// Its first rtos_yield() overwrites _mr_spt[0] with the saved SP.
 
-void __attribute__((naked)) rtos_run(void) {
-    asm volatile (
-        "ldi  r26, lo8(_mr_spt)         \n\t"
-        "ldi  r27, hi8(_mr_spt)         \n\t"
-        "%~jmp _mr_switch               \n\t"
-        ::: "memory"
-    );
+void rtos_run(void) {
+    ((TaskFunc)(uintptr_t)_mr_spt[0])();
 }
 
 #ifdef TINYRTOS_IDLE_SLEEP
 static uint8_t _mr_wait = 0; // Number of tasks waiting in rtos_delay()
+static uint8_t _mr_tick = 0; // millis() low byte when task 0 last yielded
+
+// "sei" delays interrupts by one instruction, so "sleep" always executes
+// before the next ISR – no wakeup can be lost between check and sleep.
 
 #ifdef SLPCTRL  // tinyAVR 0/1/2, AVR Dx: dedicated sleep controller
 static inline void _mr_idle(void) {
     SLPCTRL.CTRLA = SLPCTRL_SMODE_IDLE_gc | SLPCTRL_SEN_bm;
-    __asm__ __volatile__ ("sleep");
+    __asm__ __volatile__ ("sei\n\tsleep" ::: "memory");
     SLPCTRL.CTRLA = 0;
 }
 #else           // Classic AVR: SMCR (ATmega) or MCUCR (ATtiny)
@@ -171,36 +166,65 @@ static inline void _mr_idle(void) {
 #endif
 static inline void _mr_idle(void) {
     _MR_SLEEP_REG = (_MR_SLEEP_REG & ~_MR_SM_MASK) | _BV(SE); // SM = 000: idle
-    __asm__ __volatile__ ("sleep");
+    __asm__ __volatile__ ("sei\n\tsleep" ::: "memory");
     _MR_SLEEP_REG &= (uint8_t)~_BV(SE);
 }
 #endif
 #endif
 
+// LTO inlines millis() at every call site; one shared copy saves flash
+
+static uint16_t __attribute__((noinline)) _mr_millis(void) {
+    return (uint16_t)millis();
+}
+
 // 16-bit arithmetic is exact here: ms is 16 bit, the unsigned
 // subtraction handles the wrap-around of millis().
-// Idle sleep happens only in task 0's turn: after each tick every task
-// checks its deadline once before the CPU sleeps again.
+
+#ifdef TINYRTOS_IDLE_SLEEP
+// Idle sleep is decided by task 0, once per round. _mr_tick holds the
+// millis() low byte from when task 0 last yielded; every other task has
+// checked its deadline since then. If millis() is still unchanged, all
+// those checks are valid and the CPU may sleep until the next interrupt.
 
 void rtos_delay(uint16_t ms) {
-    uint16_t start = (uint16_t)millis();
-#ifdef TINYRTOS_IDLE_SLEEP
+    uint16_t start = _mr_millis();
     _mr_wait++;
-#endif
-    while ((uint16_t)((uint16_t)millis() - start) < ms) {
-#ifdef TINYRTOS_IDLE_SLEEP
-        if (_mr_wait == _mr_n && _mr_cur == 0) _mr_idle(); // once per round
-#endif
+    for (;;) {
+        cli();                                  // no tick between check and sleep
+        uint16_t now = _mr_millis();
+        if ((uint16_t)(now - start) >= ms) break;
+        if (_mr_cur == 0) {
+            if ((uint8_t)now == _mr_tick && _mr_wait == _mr_n) {
+                _mr_idle();                     // sei + sleep, wakes on next interrupt
+                continue;                       // re-check own deadline first
+            }
+            _mr_tick = (uint8_t)now;            // next round starts here
+        }
+        sei();
         rtos_yield();
     }
-#ifdef TINYRTOS_IDLE_SLEEP
+    sei();
     _mr_wait--;
-#endif
 }
+#else
+void rtos_delay(uint16_t ms) {
+    uint16_t start = _mr_millis();
+    while ((uint16_t)(_mr_millis() - start) < ms)
+        rtos_yield();
+}
+#endif
+
+// With idle sleep, a task waiting for a lock counts as waiting and checks
+// the lock once per millis() tick. Without, it checks every round.
 
 void rtos_lock(RtosLock *lock) {
     while (*lock)
+#ifdef TINYRTOS_IDLE_SLEEP
+        rtos_delay(1);
+#else
         rtos_yield();
+#endif
     *lock = 1;
 }
 

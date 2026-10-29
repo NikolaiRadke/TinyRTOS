@@ -1,5 +1,6 @@
-# V1.4.0
+# V1.5.0
 
-* Context switch saves only call-saved registers – kernel ~30 % smaller, 15 bytes less stack per task
-* Fixed idle sleep making rtos_delay() overshoot by up to one tick per task
-* rtos_yield() now always returns with interrupts enabled
+* First task runs on the Arduino stack – saves one full task stack (64 bytes RAM on ATtiny, 192 bytes on ATmega)
+* Idle sleep is now race-free – rtos_delay() never sleeps a tick too long
+* Tasks waiting in rtos_lock() no longer prevent idle sleep
+* Context switch merged into rtos_yield(), shared millis() call – smaller kernel

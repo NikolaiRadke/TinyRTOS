@@ -1,8 +1,13 @@
 /*
- * TinyRTOS V1.4.0 – Cooperative Task Scheduler
+ * TinyRTOS V1.5.0 – Cooperative Task Scheduler
  * Nikolai Radke, 2026
  *
- * Footprint: ~350 bytes flash (kernel) | 3 bytes RAM + 2 bytes and TINYRTOS_STACK_SIZE per task
+ * Footprint: ~330 bytes flash (kernel), ~250 without idle sleep
+ * RAM: 4 bytes (2 without idle sleep) + 2 bytes per task
+ *      + TINYRTOS_STACK_SIZE per task, except the first
+ *
+ * The first registered task runs on the Arduino stack and gets all free RAM.
+ * Register the task with the deepest call stack (e.g. Serial) first.
  *
  * Supported MCUs:
  * ATtiny44/45/84/85 and other ATtiny MCUs with 32 GPRs and ≥256 bytes RAM.
@@ -10,16 +15,16 @@
  * ATmega2560/2561 (experimental, 3-byte PC).
  *
  * RAM usage example (ATtiny85, TinyRTOS only – the Arduino core adds ~9 bytes):
- *   2 tasks × 64 bytes stack  = 128 bytes
- *   + kernel overhead         =   7 bytes
- *   Total                     ≈ 135 bytes
+ *   2 tasks, 1 × 64 bytes stack  =  64 bytes
+ *   + kernel overhead            =   8 bytes
+ *   Total                        ≈  72 bytes
  *
  * RAM usage example (ATmega328):
- *   3 tasks × 192 bytes stack = 576 bytes
- *   + kernel overhead         =   9 bytes
- *   Total                     ≈ 585 bytes
+ *   3 tasks, 2 × 192 bytes stack = 384 bytes
+ *   + kernel overhead            =  10 bytes
+ *   Total                        ≈ 394 bytes
  *
- * Minimum stack size per task: 20 bytes context frame
+ * Minimum stack size per task (not the first): 20 bytes context frame
  *   + call depth + ~20 bytes for timer0 ISR (millis)
  *   64 bytes recommended for simple tasks without Serial
  *
@@ -27,7 +32,7 @@
  *               millis() support must be enabled */
 
 #pragma once
-//#define TINYRTOS_NO_IDLE_SLEEP  // Uncomment to disable idle sleep: frees ~55 bytes flash, raises current draw
+//#define TINYRTOS_NO_IDLE_SLEEP  // Uncomment to disable idle sleep: frees ~80 bytes flash, raises current draw
 
 #include <stdint.h>
 #include <avr/io.h>
@@ -67,13 +72,15 @@
   #error "TINYRTOS_STACK_SIZE must be at least 40 bytes."
 #endif
 
-#if TINYRTOS_MAX_TASKS * TINYRTOS_STACK_SIZE > _TINYRTOS_RAM_WARN
+// The first task uses the Arduino stack, so only MAX_TASKS - 1 stacks count
+#if (TINYRTOS_MAX_TASKS - 1) * TINYRTOS_STACK_SIZE > _TINYRTOS_RAM_WARN
   #warning "Stack usage exceeds recommended limit – check available RAM!"
 #endif
 
 typedef void (*TaskFunc)(void);
 
 // Register a task. Call before rtos_run()
+// The first task runs on the Arduino stack, all others on their own stack.
 void rtos_add_task(TaskFunc func);
 
 // Start the scheduler. Never returns
@@ -88,6 +95,7 @@ void rtos_yield(void);
 void rtos_delay(uint16_t ms);
 
 // Lock a shared resource – waits if already in use
+// With idle sleep, a waiting task checks the lock once per millis() tick.
 typedef volatile uint8_t RtosLock;
 #define RTOS_LOCK_INIT  0
 

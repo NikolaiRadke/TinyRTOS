@@ -1,4 +1,4 @@
-# TinyRTOS V1.4.0
+# TinyRTOS V1.5.0
 
 Cooperative task scheduler with resource locks for classic ATtiny and ATmega AVR MCUs.
 

@@ -19,10 +19,10 @@
  *   Baud:  9600
  *
  * RAM usage:
- *   3 tasks × 192 bytes stack = 576 bytes
- *   + kernel overhead         =   9 bytes
- *   + Serial buffers + millis = 238 bytes
- *   Total                     = 823 bytes
+ *   3 tasks, 2 × 192 bytes stack = 384 bytes
+ *   + kernel overhead            =  10 bytes
+ *   + Serial buffers + millis    = 238 bytes
+ *   Total                        = 632 bytes
  */
 
 #include "TinyRTOS.h"
@@ -65,8 +65,8 @@ void setup() {
     Serial.begin(9600);
     Serial.println("TinyRTOS Example – type anything!");
 
+    rtos_add_task(taskCounter); // First task: runs on the Arduino stack
     rtos_add_task(taskBlink);
-    rtos_add_task(taskCounter);
     rtos_add_task(taskInput);
 
     rtos_run(); // Start scheduler and never come back

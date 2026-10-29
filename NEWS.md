@@ -2,6 +2,7 @@
 
 ## 2026
 
+* **29.10.2026** Release **V1.5.0** with up to 192 bytes less RAM and race-free idle sleep.
 * **04.10.2026** Release **V1.4.0** with a 30 % smaller kernel and exact idle sleep timing.
 * **04.10.2026** Release **V1.3.3** with fiexd Idle-Sleep compile error on tinyAVR 0/1/2 and AVR Dx (megaTinyCore, DxCore)
 * **03.10.2026** Release **V1.3.2** with fixed missing rtos_lock() – 1.3.1 did not link with resource locks

@@ -9,7 +9,7 @@ with at least **256 byte RAM**.
 Enables multiple tasks to run seemingly simultaneously on the popular microcontrollers with as little as 256 bytes of RAM.  
 
 🆕 What's new?  
-* **04.10.2026** Release **V1.4.0** with a 30 % smaller kernel and exact idle sleep timing.  
+* **29.10.2026** Release **V1.5.0** with up to 192 bytes less RAM and race-free idle sleep.  
     -- More news? Check the [newsblog](https://github.com/NikolaiRadke/TinyRTOS/blob/main/NEWS.md).
 
 ## Supported MCUs
@@ -86,23 +86,23 @@ PB3 and PB4 are free I/O pins used in the example sketch.
 
 ```
 ATtiny85 (doubleBlink):
-2 tasks × 64 bytes stack  = 128 bytes
-+ kernel overhead         =   7 bytes
-+ millis() (Arduino core) =   9 bytes
-─────────────────────────────────────
-Total                     = 144 bytes
+2 tasks, 1 × 64 bytes stack  =  64 bytes
++ kernel overhead            =   8 bytes
++ millis() (Arduino core)    =   9 bytes
+──────────────────────────────────────────
+Total                        =  81 bytes
 
 ATmega328 (without Serial):
-3 tasks × 192 bytes stack = 576 bytes
-+ kernel overhead         =   9 bytes
-─────────────────────────────────────
-Total                     ≈ 585 bytes
+3 tasks, 2 × 192 bytes stack = 384 bytes
++ kernel overhead            =  10 bytes
+──────────────────────────────────────────
+Total                        ≈ 394 bytes
 
 ATmega2560:
-4 tasks × 192 bytes stack = 768 bytes
-+ kernel overhead         =  11 bytes
-─────────────────────────────────────
-Total                     ≈ 779 bytes
+4 tasks, 3 × 192 bytes stack = 576 bytes
++ kernel overhead            =  12 bytes
+──────────────────────────────────────────
+Total                        ≈ 588 bytes
 
 ```
 
@@ -114,15 +114,19 @@ Stack size and task count can be adjusted before including the library:
 #include "TinyRTOS.h"
 ```
 
-> ⚠️ Minimum: 40 bytes per task. Deep call stacks require more.
+The first task registered with `rtos_add_task()` runs on the normal Arduino stack
+and can use all free RAM. Register the task with the deepest call stack
+(e.g. the one using Serial) first.
+
+> ⚠️ Minimum: 40 bytes per task (except the first). Deep call stacks require more.
 
 ## Idle Sleep
 
-When all tasks are waiting in `rtos_delay()`, TinyRTOS puts the CPU to sleep
-until the next millisecond tick. Timer0 keeps running, so `millis()` stays
-accurate. Measured on an ATtiny85 at 8 MHz: current draw drops by half.
+When all tasks are waiting in `rtos_delay()` or `rtos_lock()`, TinyRTOS puts the CPU
+to sleep until the next millisecond tick. Timer0 keeps running, so `millis()` stays
+accurate. A task waiting in `rtos_lock()` checks the lock once per tick.
 
-Costs ~55 bytes of flash and 1 byte of RAM. To disable, uncomment in `TinyRTOS.h`:
+Costs ~80 bytes of flash and 2 bytes of RAM. To disable, uncomment in `TinyRTOS.h`:
 
 ```cpp
 #define TINYRTOS_NO_IDLE_SLEEP
